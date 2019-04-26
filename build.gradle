@@ -23,6 +23,7 @@ buildscript{
     classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.5"
     classpath "com.jaredsburrows:gradle-license-plugin:0.8.42"
     classpath "com.qcsoftware.qc-release-plugin:com.qcsoftware.qc-release-plugin.gradle.plugin:1.0.1"
+    classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.60"
   }
 }
 plugins {
@@ -35,6 +36,7 @@ plugins {
 apply plugin: "com.jfrog.artifactory"
 apply plugin: "com.jaredsburrows.license"
 apply plugin: "com.qcsoftware.qc-release-plugin"
+apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
 def javaVersion =JavaVersion.VERSION_1_8
 
@@ -127,4 +129,10 @@ compileTestKotlin {
 java {
   sourceCompatibility = javaVersion
   targetCompatibility = javaVersion
+}
+
+task generateGitChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+  file = new File("CHANGELOG.md")
+  untaggedName = project.version
+  ignoreCommitsIfMessageMatches = ".*\\[skip ci\\].*"
 }
