@@ -1,0 +1,20 @@
+
+pluginManagement{
+  repositories {
+    maven {
+      url "$artifactory_contextUrl/$artifactory_resolve_repository"
+      credentials {
+        username "$artifactory_user"
+        password "$artifactory_password"
+      }
+    }
+    mavenLocal()
+    gradlePluginPortal()
+  }
+}
+
+// add products based on gradle.properties
+if(properties['qcToolkit.isAgainstLocal'].toBoolean()){
+  include properties['qcToolkit.localName']
+  project(properties['qcToolkit.localName']).projectDir = new File(products_dir)
+}

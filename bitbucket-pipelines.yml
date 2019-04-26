@@ -1,0 +1,34 @@
+image: firearrow/oracle-java-8-jdk-git
+
+pipelines:
+  pull-requests:
+    '**':
+      - step:
+          name: Build
+          caches:
+            - gradle
+          script:
+            - bash ./gradlew build -Partifactory_user=$ARTIFACTORY_USER -Partifactory_password=$ARTIFACTORY_PASSWORD
+  branches:
+    master:
+      - step:
+          name: Build and Tag
+          caches:
+            - gradle
+          script:
+            - chmod -R +x ./build-scripts
+            - export QC_PLUGIN_VERSION=$(./build-scripts/update-version.sh)
+            - bash ./gradlew build -Partifactory_user=$ARTIFACTORY_USER -Partifactory_password=$ARTIFACTORY_PASSWORD
+            - bash ./gradlew generateGitChangelog -Partifactory_user=$ARTIFACTORY_USER -Partifactory_password=$ARTIFACTORY_PASSWORD
+            - apt-get update && apt-get install -y curl jq
+            - >
+              export access_token=$(curl -s -X POST -u "${CLIENT_ID}:${CLIENT_SECRET}" \
+                https://bitbucket.org/site/oauth2/access_token \
+                -d grant_type=client_credentials -d scopes="repository"| jq --raw-output '.access_token')
+            - git remote set-url origin "https://x-token-auth:${access_token}@bitbucket.org/${BITBUCKET_REPO_OWNER}/${BITBUCKET_REPO_SLUG}"
+            - git add .
+            - git commit -m "TB-130 - [skip ci] update to ${QC_PLUGIN_VERSION}"
+            - git push
+            - git tag $QC_PLUGIN_VERSION
+            - git push origin --tags
+
