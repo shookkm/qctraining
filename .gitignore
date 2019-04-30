@@ -4,3 +4,5 @@
 /build/
 /qc-releases/
 /out/
+.project
+.classpath
