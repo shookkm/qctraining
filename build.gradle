@@ -110,6 +110,20 @@ dependencies {
 eclipse {
   classpath {
     containers 'org.jetbrains.kotlin.core.KOTLIN_CONTAINER'
+    defaultOutputDir = file("${buildDir}/build-eclipse")
+    downloadSources = true
+
+    /*
+     * needed with newer gradle
+     */
+    file.whenMerged {
+      entries.each {
+        source ->
+          if (source.kind == 'src' && source.toString().contains('output')) {
+            source.output = '${buildDir}/build-eclipse'
+          }
+      }
+    }
   }
 }
 
