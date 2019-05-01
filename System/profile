@@ -1,2 +1,0 @@
-. projectProfile.sh -p Keurig-Spartanburg -P 38800 -s System -n keurigSpartanburg -r 13.2.1 $*
-export DATABASE_PORT=54000

@@ -1,14 +1,14 @@
-# Keurig Spartanburg
+# Java Template
 
 {{#tags}}
   ## {{name}}
   {{#issues}}
     {{#hasIssue}}
       {{#hasLink}}
-        ### {{name}} [{{issue}}]({{link}}) {{Keurig-Spartanburg}}
+        ### {{name}} [{{issue}}]({{link}}) {{title}}
       {{/hasLink}}
       {{^hasLink}}
-        ### {{name}} {{issue}} {{Keurig-Spartanburg}}
+        ### {{name}} {{issue}} {{title}}
       {{/hasLink}}
     {{/hasIssue}}
     {{^hasIssue}}
@@ -22,7 +22,7 @@
         * {{.}}
       {{/messageBodyItems}}
 
-      [{{hash}}](https://bitbucket.org/qcteam1/keurig-spartanburg/commits/{{hash}}) {{authorName}} *{{commitTime}}*
+      [{{hash}}](https://bitbucket.org/qcteam1/javatemplate/commits/{{hash}}) {{authorName}} *{{commitTime}}*
 
     {{/commits}}
 
