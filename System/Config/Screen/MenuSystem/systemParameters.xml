@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     systemParameters.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: systemParameters.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title           = "System Parameters"
+            height          = "550"
+            width           = "1100"
+            frametype       = "internal"
+            globalThreading = "true"
+            updateSecurity  = "sysParams.editParams"
+            insertSecurity  = "sysParams.editParams"
+            deleteSecurity  = "sysParams.editParams" >
+
+  <DBCONNECT type         = "predefined"
+             connectionId = "default"
+             setglobal    = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "groupMap"
+               loadSql = "select GroupId, Description
+                            from SystemParameterGroups
+                           order by displayOrder"/>
+
+    <VECTOR name = "groups"
+            loadSql = "select Description
+                         from SystemParameterGroups
+                        order by displayOrder"/>
+  </GLOBAL_DEFINITIONS>
+
+  <SPLITPANE divider = "180" orientation = "horizontal" >
+    <FLEXTREECOMPONENT name    = "GroupTree"
+                       init    = "groupTree"
+                       refresh = "true"
+                       records = "25">
+      <DBCONNECT type = "global" />
+
+      <TREE name = "groupTree" root = "GROUPS">
+        <TREEICON level = "0" iconType = "standard" icon = "packages.png" micon="cubes"/>
+        <TREEICON level = "1" iconType = "standard" icon = "package.png" micon="cube"/>
+
+        <SELECT level = "0" sql = "select distinct spg.description Description,
+                                                   spg.groupId GroupId,
+                                                   spg.displayOrder DisplayOrder
+                                     from systemParameterGroups spg
+                                     join systemParameters sp
+                                    where sp.UserEdit = 1
+                                    order by spg.DisplayOrder"/>
+      </TREE>
+    </FLEXTREECOMPONENT>
+
+    <SPLITPANE divider = "320" 
+               orientation = "vertical">
+      <FLEXTABLECOMPONENT name            = "SystemParameter"
+                          greenbar        = "true"
+                          log             = "true"
+                          refresh         = "true"
+                          refreshOnUpdate = "true">
+        <DBCONNECT type = "global" />
+        <TRIGGER name = "GroupTree" />
+        <TRIGGER name = "DefaultPanel" />
+
+        <TABLE key = "groupTree.0" >
+          <SELECT sql = "select sp.groupId 'Group',
+                                sp.Name,
+                                sp.Value,
+                                sp.Description
+                           from systemParameters sp
+                           join systemParameterGroups spg
+                          where sp.userEdit = 1
+                          order by spg.displayOrder, sp.name"/>
+
+          <ALTVALUES>
+            <FIELD name = "Group" ifdef = "groupMap"/>
+          </ALTVALUES>
+
+          <UPDATE sql = "call SystemParamScreenUpdateParam(/*Name, //Group, //Value, //Description)"/>
+
+          <EDITOR restoreHide = "true"
+                  title       = "PARAMETER"
+                  saveText    = "SAVE" 
+                  cancelText  = "CANCEL">
+            <FIELD name = "Group" required = "true">
+              <COMBO ifdef = "groups"/>
+            </FIELD>
+            <FIELD name = "Name">
+              <TEXTFIELD/>
+            </FIELD>
+            <FIELD name = "Value">
+              <TEXTFIELD/>
+            </FIELD>
+            <FIELD name = "Description">
+              <TEXTAREA preferredSize = "400, 100"/>
+            </FIELD>
+          </EDITOR>
+        </TABLE>
+
+        <TABLE key = "groupTree.1" >
+          <SELECT sql = "select Name,
+                                Value,
+                                Description
+                           from systemParameters
+                          where groupId = //groupTree.1
+                            and userEdit = 1
+                          order by name"/>
+
+          <UPDATE sql = "call SystemParamScreenUpdateParam(/*Name, //groupTree.1, //Value, //Description)"/>
+
+          <EDITOR restoreHide = "true"
+                  title       = "PARAMETER"
+                  saveText    = "SAVE" 
+                  cancelText  = "CANCEL">
+            <FIELD name = "Name">
+              <TEXTFIELD/>
+            </FIELD>
+            <FIELD name = "Value">
+              <TEXTFIELD/>
+            </FIELD>
+            <FIELD name = "Description">
+              <TEXTAREA preferredSize = "400, 100"/>
+            </FIELD>
+          </EDITOR>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+
+      <SPLITPANE divider = "100" 
+                 orientation = "vertical">
+        <FLEXTABLECOMPONENT name            = "SystemParameterOptions"
+                            greenbar        = "true"
+                            log             = "true"
+                            refresh         = "true"
+                            refreshOnUpdate = "true">
+          <DBCONNECT type="global" />
+          <TRIGGER name="SystemParameter" />
+          <TABLE key="SystemParameter:groupTree.0">
+            <SELECT sql = "select MinValue,
+                                  MaxValue,
+                                  DefaultValue
+                             from SystemParameters
+                            where name = //Name"/>
+
+            <UPDATE sql = "call SystemParamScreenUpdateOptions(//Name, //DefaultValue, //MinValue, //MaxValue, '$QC_USER')" />
+          </TABLE>
+
+          <TABLE key="SystemParameter:groupTree.1">
+            <SELECT sql = "select MinValue,
+                                  MaxValue,
+                                  DefaultValue
+                             from SystemParameters
+                            where name = //Name"/>
+
+            <UPDATE sql = "call SystemParamScreenUpdateOptions(//Name, //DefaultValue, //MinValue, //MaxValue, '$QC_USER')" />
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+
+        <FLEXBUTTONPANEL name="DefaultPanel" rows = "1" columns="1"
+                         pad="3" verticalBorder="10" horizontalBorder="100"
+                         autoCommit = "true" handleResult = "true"
+                         messageMode = "popup" 
+                         parentRequired = "true"
+                         enableWarning = "true"
+                         areYouSureMsg = "SetParameterToDefaultValue?">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "SystemParameter" />
+          <BUTTON name = "dummy1" text = ""   visible = "false" />
+          <BUTTON name = "Default" text = "BtnSetToDefaultValue"
+                  foreground = "blue"
+                  action = "refresh">
+            <SQL_COMMAND sqlType="returnErrMsg"
+                         sql="Call SystemParamScreenSetDefaultValue(//Name)"
+                         successMessage="ParameterHasBeenSetToDefaultValue"/>
+          </BUTTON>
+          <BUTTON name = "dummy2" text = "" visible = "false"  />
+        </FLEXBUTTONPANEL>
+      </SPLITPANE>
+    </SPLITPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

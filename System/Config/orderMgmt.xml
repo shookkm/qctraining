@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     orderMgmt.xml
+   - Description:
+   -
+   - (c) COPYRIGHT Queen City Software, Inc. 2014 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of Queen City Software, Inc.
+   -
+   - $Id: orderMgmt.xml 76 2017-03-03 18:27:51Z wlw $
+   - Notes:
+  -->
+<OrderMgmt>
+  <OrderMgmtListeners logStatusChange = "false">
+
+  </OrderMgmtListeners>
+</OrderMgmt>

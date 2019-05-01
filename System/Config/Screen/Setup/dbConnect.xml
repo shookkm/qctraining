@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     dbConnect.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: dbConnect.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<dbConnect>
+  <DbConnect id = "default"
+             machine = "$DATABASE_MACHINE"
+             database = "$DATABASE_NAME"
+             port = "$DATABASE_PORT"
+             adapter = "Library.Database.JConnect7DatabaseAdapter"
+             user = "qcScreens"
+             password = "qcScreens"
+             trackStatements = "true"
+             isolationLevel = "1" />
+             
+  <DbPool dbId = "default" 
+          minSize = "1"/>
+</dbConnect>

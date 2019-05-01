@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     navigatorMenuItems.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: navigatorMenuItems.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<displayNavigatorMenuItem>
+        <menuitem commandId = "sortRate" 
+                  text = "Sort Rate"
+                  handler = "defaultScreen" />
+                  
+        <menuitem commandId = "divertStats" 
+                  text = "Divert Statistics"
+                  handler = "defaultScreen" />
+                  
+        <menuitem commandId = "scannerStatistics" 
+                  text = "Scanner Statistics"
+                  handler = "defaultScreen" />
+                  
+        <menuitem commandId = "scannerLog" 
+                  text = "Scanner Log"
+                  handler = "defaultScreen" />
+                  
+        <menuitem commandId = "scaleLog" 
+                  text = "Scale Log"
+                  handler = "defaultScreen" />
+</displayNavigatorMenuItem>

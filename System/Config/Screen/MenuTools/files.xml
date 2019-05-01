@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     files.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: files.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<reportsMenuFiles>
+      <Screen commandId = "knowledgeBase" 
+              count = "1"
+              screenClass = "Gui.KnowledgeBase.FrmKnowledgeBaseInquiry" >
+        <Params>
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "dbtool" 
+              helpId = "dbtool"  
+              count = "1"
+              screenClass = "Gui.DbMetaFrame.FrmDatabaseTool">
+        <Params>
+          <param name = "connectionId" 
+                 value = "default" />
+          <param name = "title" 
+                 value = "Database Tool" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "databaseLockReport" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName" 
+                 value = "MenuTools/dbLocksReport.xml" />
+          <param name = "xmlSource" 
+                 value = "project" />
+        </Params>
+      </Screen>
+
+
+      <Screen commandId   = "wcsEvents"
+              count       = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "wcsEvents.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "wcsWatches"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "wcsWatches.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "message" 
+              count = "1"
+              screenClass = "Gui.Utils.FrmMessenger"/>
+
+      <Screen commandId = "mnemonicsView" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName" 
+                 value = "MenuTools/mnemonics.xml" />
+          <param name = "xmlSource"   
+                 value = "project" />
+        </Params>
+      </Screen>     
+
+      <Screen commandId = "storedProcs" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName" 
+                 value = "MenuTools/storedProcs.xml" />
+          <param name = "xmlSource"   
+                 value = "project" />
+        </Params>
+      </Screen>     
+      
+      <Screen commandId = "testScan" 
+              count = "1"
+              screenClass = "Gui.Utils.FrmTestScannerMgr">
+        <Params>
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "languageTranslations"
+              count = "1"
+              screenClass = "Gui.Language.FrmNewDictionaryManager">
+        <Params>
+          <param name = "title"
+                 value = "Language Translations" />
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "projectDictionary"
+              count = "1"
+              screenClass = "Gui.Language.FrmProjectDictionaryEditor">
+        <Params>
+          <param name = "title" 
+                 value = "Site Terms" />
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "utilityDictionary"
+              count = "1"
+              screenClass = "Gui.Language.FrmEditSpecialDictionary">
+        <Params>
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "tcpipMessages" 
+              count = "1" 
+              screenClass = "Gui.TcpipInfoFrame.SocketsTcpipInfoFrame">
+      </Screen>
+      
+      <Screen commandId = "userSettings"
+              count = "1"
+              screenClass = "com.qcsoftware.ui.util.swing.FrmUserSettings">
+        <Params>
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+</reportsMenuFiles>

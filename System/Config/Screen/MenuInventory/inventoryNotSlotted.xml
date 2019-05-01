@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     inventoryNotSlotted.xml
+   - Description:
+   -
+   - (c) COPYRIGHT Queen City Software, Inc. 2013 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of Queen City Software, Inc.
+   -
+   - $Id: inventoryNotSlotted.xml 9887 2018-03-07 18:58:07Z rlh $
+   - Notes:
+  -->
+
+<FLEXSCREEN title = "Inventory Not Slotted Report" 
+            height = "500" 
+            width = "1000" 
+            frametype = "internal"
+            report = "false" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+
+  </GLOBAL_DEFINITIONS>
+
+  <REPORTS preview = "true" records = "1000">
+  </REPORTS>
+
+  <FLEXTABLECOMPONENT name = "inventoryNotSlottedView" 
+                      init = "inventoryNotSlottedInit" 
+                      refresh = "true" 
+                      greenbar = "true"
+                      records = "1000"
+                      ignoreEventConcatenation = "true">
+
+    <DBCONNECT type = "global" />
+
+    <TABLE key = "inventoryNotSlottedInit"
+  	     title = "Inventory Not Slotted Report" >
+      <SELECT sql =  "select * from InventoryNotSlottedView" />
+                     
+      <TABLECOLUMNS>
+        <TABLECOLUMN name = "ItemID"  
+                     maxWidth = "150" />
+        <TABLECOLUMN name = "Unit"  
+                     maxWidth = "150" />
+        <TABLECOLUMN name = "Description"  
+                     maxWidth = "650" />
+      </TABLECOLUMNS>          
+
+    </TABLE>
+  </FLEXTABLECOMPONENT>    
+
+</FLEXSCREEN>

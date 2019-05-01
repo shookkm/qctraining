@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     scales.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: scales.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Scales" height = "350" width = "750"
+            frametype = "internal"
+            updateSecurity = "scaleMaint.edit"
+            insertSecurity = "scaleMaint.edit"
+            deleteSecurity = "scaleMaint.edit" >
+
+  <DBCONNECT type = "predefined"
+             connectionId = "default"
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+
+    <VECTOR name = "scaleStatuses"
+            loadSql = "select ReturnCodeMsg
+                         from mnemonicCodesView
+                        where mnemonicType = 'SCALE_STATUSES'"/>
+
+    <VECTORMAP name = "scaleStatusesXref"
+               loadSql = "select Idx, ReturnCodeMsg
+                            from MnemonicCodesView
+                           where mnemonicType = 'SCALE_STATUSES'"/>
+
+    <VECTOR name = "toleranceModes"
+            loadSql = "select ReturnCodeMsg
+                         from mnemonicCodesView
+                        where mnemonicType = 'SCALE_TOLERANCE_MODES'"/>
+
+    <VECTORMAP name = "toleranceModeXref"
+               loadSql = "select Idx, ReturnCodeMsg
+                            from mnemonicCodesView
+                           where mnemonicType = 'SCALE_TOLERANCE_MODES'"/>
+
+    <VECTOR name = "sorterIds"
+            loadSql = "select Description
+                         from sorterIds"/>
+
+    <VECTORMAP name = "sorterIdXref"
+               loadSql = "select SorterId, Description
+                            from sorterIds"/>
+  </GLOBAL_DEFINITIONS>
+
+  <FLEXTABLECOMPONENT name = "Scales" 
+                      init = "ScaleTable"
+                      refresh = "true"
+                      greenbar = "true" >
+
+    <DBCONNECT type = "global" />
+
+    <TABLE key="ScaleTable">
+
+      <SELECT sql = "select SorterId, Description, Tolerance,
+                            ToleranceMode, UpperAccuracy,
+                            LowerAccuracy, ImpliedDecimalPlace, Status
+                       from Scales
+                      order by sorterId"/>
+
+      <DELETE sql = "delete from Scales where sorterId = //SorterId"/>
+      <INSERT sql = "call ScaleConfigAddScaleEx(//SorterId,
+                                                //Description,
+                                                //Tolerance,
+                                                //ToleranceMode,
+                                                //UpperAccuracy,
+                                                //LowerAccuracy,
+                                                //ImpliedDecimalPlace,
+                                                //Status)"/>
+      <UPDATE sql = "call ScaleConfigUpdateScaleEx(//SorterId,
+                                                   //Description,
+                                                   //Tolerance,
+                                                   //ToleranceMode,
+                                                   //UpperAccuracy,
+                                                   //LowerAccuracy,
+                                                   //ImpliedDecimalPlace,
+                                                   //Status)"/>
+
+      <TABLECOLUMNS>
+        <TABLECOLUMN name = "Tolerance" preferredWidth = "35"/>
+        <TABLECOLUMN name = "ToleranceMode" preferredWidth = "120"/>
+        <TABLECOLUMN name = "Status" preferredWidth = "35"/>
+      </TABLECOLUMNS>
+
+      <ALTVALUES>
+        <FIELD name = "SorterId" ifdef = "sorterIdXref"/>
+        <FIELD name = "ToleranceMode" ifdef = "toleranceModeXref"/>
+        <FIELD name = "Status" ifdef = "scaleStatusesXref"/>
+      </ALTVALUES>
+
+      <EDITOR restoreHide = "true" title = "Scale Editor">
+
+        <FIELD name = "SorterId">
+          <COMBO editable = "false" ifdef = "sorterIds" />
+        </FIELD>
+
+        <FIELD name = "Description">
+          <TEXTFIELD />
+        </FIELD>
+
+        <FIELD name = "Tolerance">
+          <NUMERICFIELD />
+        </FIELD>
+
+        <FIELD name = "ToleranceMode">
+          <COMBO editable = "false" ifdef = "toleranceModes" />
+        </FIELD>
+
+        <FIELD name = "UpperAccuracy">
+          <NUMERICFIELD />
+        </FIELD>
+
+        <FIELD name = "LowerAccuracy">
+          <NUMERICFIELD />
+        </FIELD>
+
+        <FIELD name = "ImpliedDecimalPlace">
+          <NUMERICFIELD />
+        </FIELD>
+
+        <FIELD name = "Status">
+          <COMBO editable = "false" ifdef = "scaleStatuses" />
+        </FIELD>
+      </EDITOR>
+    </TABLE>
+  </FLEXTABLECOMPONENT>
+</FLEXSCREEN>

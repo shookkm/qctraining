@@ -1,0 +1,615 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     skuReports.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: skuReports.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "SKU Reports" height = "600" width = "900" frametype = "internal"
+            report = "false"
+            updateSecurity = "skuReport.edit"
+            insertSecurity = "skuReport.edit"
+            deleteSecurity = "skuReport.edit" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTOR name = "Totals"> 
+       <ITEM value = "false" />
+       <ITEM value = "true" />
+    </VECTOR>
+
+    <VECTOR name = "operators1"> 
+       <ITEM value = " =" />
+       <ITEM value = "like" />
+    </VECTOR>
+
+    <VECTOR name = "operators2"> 
+       <ITEM value = " =" />
+       <ITEM value = "&lt;" />
+       <ITEM value = "&lt;=" />
+       <ITEM value = "&lt;&gt;" />
+       <ITEM value = "&gt;" />
+       <ITEM value = "&gt;=" />
+    </VECTOR>
+    
+    <VECTOR name = "operatorIn"> 
+       <ITEM value = "in" />
+       <ITEM value = "out" />
+    </VECTOR>
+    
+   <VECTORMAP name = "orderBy" >
+      <ITEM key = "Lines desc"      value = "Lines desc" />
+      <ITEM key = "Lines"           value = "Lines" />
+      <ITEM key = "Picks desc"      value = "Picks desc" />
+      <ITEM key = "Picks"           value = "Picks" />
+      <ITEM key = "Shorts desc"     value = "Shorts desc" />
+      <ITEM key = "Shorts"          value = "Shorts" />
+      <ITEM key = "Sku"             value = "sku" />
+      <ITEM key = "Sku desc"        value = "sku desc" />
+      <ITEM key = "ZoneId"          value = "ZoneId" />
+      <ITEM key = "ZoneId desc"     value = "ZoneId desc" />
+    </VECTORMAP>
+    
+    <VECTORMAP name = "zones"
+               loadSql = "select '' masterZoneId, '' value
+                          union
+                          select distinct zoneId, coalesce(description, zoneId) value
+                            from LocationZones
+                            where flags &amp; gLocationZoneForwardPickFlag = gLocationZoneForwardPickFlag
+                            order by masterZoneId" />
+  </GLOBAL_DEFINITIONS>
+
+  <REPORTS preview = "true" records = "1000">
+  </REPORTS>
+
+  <TABPANE>
+    <TAB title = "SKU By Month">
+      <SPLITPANE  divider = "110" orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "SkuMonthSqlFilter"
+                                   orientation = "horizontal"
+                                   appendAsAnd = "false"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "3"
+                                   editorWidth = "120"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "false">
+
+          <DBCONNECT type = "global" connectionId = "epicor" />                    
+
+         <FILTER_OPTION label = "From Month"
+                         altValue = "fromMonth"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM"/>
+
+          </FILTER_OPTION>
+						 
+          <FILTER_OPTION label = "ZoneId"
+                         altValue = "zoneId"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zones"/>
+          </FILTER_OPTION>
+                         		  
+          <FILTER_OPTION label = "SKU" 
+                         altValue = "unit" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "To Month"
+                         altValue = "toMonth"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM"/>
+          </FILTER_OPTION>
+          
+          <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Picks (&gt;,&lt;,=)" 
+                         altValue = "picksGtr" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Lines (&gt;,&lt;,=)" 
+                         altValue = "linesGtr" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+        </FLEXSQLMODIFIERCOMPONENT>
+        
+        <SPLITPANE  divider = "110" orientation = "vertical">
+        
+          <FLEXTABLECOMPONENT name = "SkuCountsMonthTable" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+                              sortable = "true"                              
+                              records = "2000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuMonthSqlFilter" />
+
+            <TABLE key = "SkuMonthSqlFilter:execute" >
+              <SELECT sql = "call SkuReportTotals(//fromMonth, 
+                                                  //toMonth,
+                                                  'hide', 
+                                                  'hide',
+                                                  //unit, 
+                                                  //locationId, 
+                                                  'hide', 
+                                                  //zoneId, 
+                                                  'month desc', 
+                                                  'month',
+                                                  20000,
+                                                  //picksGtr,
+                                                  //linesGtr)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Month"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "OperatorId"
+                             preferredWidth = "100"/>
+                             
+                <TABLECOLUMN name = "Sku"
+                             preferredWidth = "30"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name = "SkuCountsMonthTableDetails" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+ 							                sortable = "true"
+                              records = "2000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuCountsMonthTable" />
+
+            <TABLE key = "SkuCountsMonthTable:SkuMonthSqlFilter:execute" >
+              <SELECT sql = "call SkuReportDetails(//Month, 
+                                                   '',
+                                                   'hide', 
+                                                   'hide',
+                                                   //SKU, 
+                                                   //LocationId, 
+                                                   'hide', 
+                                                   //ZoneId, 
+                                                   '', 
+                                                   'month',
+                                                   20000)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Month"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+
+    <TAB title = "SKU By Day">
+      <SPLITPANE  divider = "110" orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "SkuDaySqlFilter"
+                                   orientation = "horizontal"
+                                   appendAsAnd = "false"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "3"
+                                   editorWidth = "120"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "false">
+
+          <DBCONNECT type = "global" />                    
+
+         <FILTER_OPTION label = "From Date"
+                         altValue = "fromDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "SKU" 
+                         altValue = "unit" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "ZoneId"
+                         altValue = "zoneId"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zones"/>
+          </FILTER_OPTION>
+                          
+         <FILTER_OPTION label = "To Date"
+                         altValue = "toDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+           <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Picks (&gt;,&lt;,=)" 
+                         altValue = "picksGtr" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Lines (&gt;,&lt;,=)" 
+                         altValue = "linesGtr" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+ 
+        </FLEXSQLMODIFIERCOMPONENT>
+        <SPLITPANE  divider = "110" orientation = "vertical">
+        
+          <FLEXTABLECOMPONENT name = "SkuCountsDayTable" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+ 							                sortable = "true"
+                              records = "2000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuDaySqlFilter" />
+
+            <TABLE key = "SkuDaySqlFilter:execute" >
+              <SELECT sql = "call SkuReportTotals(//fromDate, 
+                                                  //toDate,
+                                                  'hide', 
+                                                  'hide',
+                                                  //unit, 
+                                                  //locationId, 
+                                                  'hide', 
+                                                  //zoneId, 
+                                                  'day desc', 
+                                                  'day',
+                                                  20000,
+                                                  //picksGtr,
+                                                  //linesGtr)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Day"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "OperatorId"
+                             preferredWidth = "100"/>
+                             
+                <TABLECOLUMN name = "Sku"
+                             preferredWidth = "30"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name = "SkuCountsDayTableDetails" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+ 							                sortable = "true"
+                              records = "1000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuCountsDayTable" />
+
+            <TABLE key = "SkuCountsDayTable:SkuDaySqlFilter:execute" >
+              <SELECT sql = "call SkuReportDetails(//Day, 
+                                                   '',
+                                                   'hide', 
+                                                   'hide',
+                                                   //SKU, 
+                                                   //LocationId, 
+                                                   'hide', 
+                                                   //ZoneId, 
+                                                   '', 
+                                                   'day',
+                                                   20000)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Day"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "OperatorId"
+                             preferredWidth = "100"/>
+                             
+                <TABLECOLUMN name = "Sku"
+                             preferredWidth = "30"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>         
+        </SPLITPANE>
+       </SPLITPANE>
+    </TAB>
+
+    <TAB title = "SKU Shorts By Day">
+      <SPLITPANE  divider = "110" orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "SkuShortSqlFilter"
+                                   orientation = "horizontal"
+                                   appendAsAnd = "false"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "3"
+                                   editorWidth = "120"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "false">
+
+          <DBCONNECT type = "global" />                    
+
+         <FILTER_OPTION label = "From Date"
+                         altValue = "fromDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "SKU" 
+                         altValue = "unit" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "ZoneId"
+                         altValue = "zoneId"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zones"/>
+          </FILTER_OPTION>
+                          
+         <FILTER_OPTION label = "To Date"
+                         altValue = "toDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+           <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+ 
+        </FLEXSQLMODIFIERCOMPONENT>
+        <SPLITPANE  divider = "110" orientation = "vertical">
+        
+          <FLEXTABLECOMPONENT name = "SkuCountsShortTable" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+							                sortable = "true"
+                              records = "1000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuShortSqlFilter" />
+
+            <TABLE key = "SkuShortSqlFilter:execute" >
+              <SELECT sql = "call SkuReportTotals(//fromDate, 
+                                                  //toDate,
+                                                  'hide', 
+                                                  'hide',
+                                                  //unit, 
+                                                  //locationId, 
+                                                  'hide', 
+                                                  //zoneId, 
+                                                  'day desc', 
+                                                  'shorts',
+                                                  20000)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Day"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "OperatorId"
+                             preferredWidth = "100"/>
+                             
+                <TABLECOLUMN name = "Sku"
+                             preferredWidth = "30"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name = "SkuCountsDayTableDetails" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+							                sortable = "true"
+                              records = "1000" 
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "SkuCountsShortTable" />
+
+            <TABLE key = "SkuCountsShortTable:SkuShortSqlFilter:execute" >
+              <SELECT sql = "call SkuReportDetails(//Day, 
+                                                   '',
+                                                   'hide', 
+                                                   'hide',
+                                                   //SKU, 
+                                                   //LocationId, 
+                                                   'hide', 
+                                                   //ZoneId, 
+                                                   '', 
+                                                   'shorts',
+                                                   20000)" />
+                                                         
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Day"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "OperatorId"
+                             preferredWidth = "100"/>
+                             
+                <TABLECOLUMN name = "Sku"
+                             preferredWidth = "30"/>
+                             
+                <TABLECOLUMN name = "LocationId"
+                             preferredWidth = "20"/>
+                             
+                <TABLECOLUMN name = "ZoneId"
+                             maxWidth = "70"/>
+                             
+                <TABLECOLUMN name = "Lines"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Picks"
+                             maxWidth = "80"
+                             align = "right"/>
+                             
+               <TABLECOLUMN name = "Shorts"
+                             maxWidth = "80"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>         
+        </SPLITPANE>
+       </SPLITPANE>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

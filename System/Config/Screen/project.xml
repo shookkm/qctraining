@@ -1,0 +1,302 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     project.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: project.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+
+<!--
+runscreens -p qcDev -xml projectRich.xml -t 0x0531
+runscreens -p qcDev -sd systemRich -t 0x0531
+runscreens -p qcDev -t 0x0531
+-->
+
+<Project projectName = "KDP - Spartanburg">
+
+  <!-- register one or more connections -->
+  <!-- QC Software databases -->
+  <!--
+-->
+  <SystemDefs>
+    <SystemDef name = "GIF_DIR" 
+               value = "$PROJECT_BASE\Gif" />
+    <SystemDef name = "SCREEN_CONFIG_DIR" 
+               value = "$CONFIG_DIR/Screen" />
+    <SystemDef name = "HELP_DIR" 
+               value = "$PROJECT_BASE/Help" />
+    <SystemDef name = "TABLE_EXPORT_ENABLED"  
+               value = "true" />
+    <SystemDef name = "TRACER_LEVEL" 
+               value = "0x531" />
+               
+    <!--
+       - 0X0001 = Always
+       - 0X0002 = Navigator
+       - 0x0004 = OMS
+       - 0x0008 = IMS
+       - 0x0010 = SMS
+       - 0x0020 = Receiving
+       - 0x0040 = Pack Verify
+       - 0x0100 = OPEX
+       - 0x0200 = ATOP
+       - 0x0800 = Dashboard
+       - 0x1000 = ?
+      -->
+    <SystemDef name = "QCAPP_INCLUDE_FLAGS" 
+               value = "47" />              
+  </SystemDefs>
+
+  <Include includeFlag = "0x001"
+           filename = "$SCREEN_CONFIG_DIR/Setup/dbConnect.xml"/>
+
+  <UI_Props>
+    <UI_Prop name = "Table.greenbar"  
+             type = "color"  
+             value = "PALE_YELLOW" />
+    <UI_Prop name = "FrameBackground.background"  
+             type = "color"
+             value = "OCEAN_BLUE" />
+    <UI_Prop name = "InternalFrame.activeTitleBackground"  
+             type = "color"
+             value = "PALE_YELLOW" />
+    <UI_Prop name = "Icon.logoMain"
+             type = "string"
+             value = "pulse.png" />
+    <UI_Prop name = "Icon.logo"
+             type = "string"
+             value = "pulseSmall.png" />
+  </UI_Props>
+
+  <Include includeFlag = "0x001"
+           filename="$CONFIG_DIR/orderMgmt.xml" />
+  <Include includeFlag = "0x001"
+           filename="$CONFIG_DIR/qcClasses.xml" />
+
+  <Mainframe filename = "mymainframefile.xml"
+             title = "KDP - Spartanburg"
+             logOnText = "Log On..."
+             logOffText = "Log Off"  
+             hideDisabledMenus = "true"
+             passwordProtected = "true" 
+             defaultSecurityRequired = "true"
+             backImage = "pulseBackground.png"
+             imageRealSizing = "true"
+             backColor = "51, 51, 51"
+             imageSrc = "project"
+             maximized = "false"
+             hideSecurity = "true"
+             baseDb = "default" 
+             logoffTimerEnabled = "false"
+             securityDb = "default" 
+             enableAccessMgr = "false">
+    <Menu_List>
+      <!--
+         - File menu is always required.
+       -->
+      <menu commandId = "file" 
+            text = "File" 
+            accelerator = "F"
+            security = "false" 
+            dome = "true">
+
+        <menuitem commandId = "logon" 
+                  text = "Log On..." 
+                  isLogOnItem = "true"
+                  handler = "defaultCommand" 
+                  security = "false"/>
+
+        <separator />
+
+        <menuitem commandId = "exit" 
+                  text = "Exit" 
+                  handler = "defaultCommand"
+                  security = "false"/>
+      </menu>
+
+      <!-- the menus are created in the order of the include files. 
+         - If the includeFlag does not AND with the variable,
+         - the menu is not created.
+        -->
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuSystem/menus.xml"/>
+               
+      <Include includeFlag = "0x008"
+               filename = "$SCREEN_CONFIG_DIR/MenuInventory/menus.xml"/>   
+               
+      <Include includeFlag = "0x0020"
+               filename = "$SCREEN_CONFIG_DIR/MenuReceiving/menus.xml"/>   
+               
+      <Include includeFlag = "0x0004"
+               filename = "$SCREEN_CONFIG_DIR/MenuOperations/menus.xml"/> 
+               
+      <Include includeFlag = "0x0010"
+               filename = "$SCREEN_CONFIG_DIR/MenuShipping/menus.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuDisplay/menus.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuReports/menus.xml"/>
+               
+      <Include includeFlag = "0x304"
+               filename = "$SCREEN_CONFIG_DIR/MenuMaintenance/menus.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuTools/menus.xml"/>
+               
+      <Include includeFlag = "0x004"
+               filename = "$SCREEN_CONFIG_DIR/MenuDashboard/menus.xml"/>
+       
+      <menu commandId = "window" 
+            text = "Window" 
+            isWindowItem = "true"
+            accelerator = "W" 
+            security = "false">
+        <menuitem commandId = "cascade" 
+                  text = "Cascade"
+                  handler = "defaultCommand" 
+                  security = "false"/>
+
+        <separator />
+
+        <menuitem commandId = "close all" 
+                  text = "Close All"
+                  handler = "defaultCommand"  
+                  security = "false" />
+      </menu>
+
+      <menu commandId = "help" 
+            text = "Help"
+            accelerator = "H"
+            security = "false">
+        <menuitem commandId = "mainHelp" 
+                  text = "Help"
+                  handler = "defaultHelp" 
+                  security = "false"/>
+        <separator/>
+
+        <menuitem commandId = "about" 
+                  text = "About"
+                  handler = "defaultCommand" 
+                  security = "false"/>
+      </menu>
+
+      <Include includeFlag = "0x0800"
+               filename = "$SCREEN_CONFIG_DIR/MenuDashboard/menus.xml"/>
+    </Menu_List>
+
+    <Include includeFlag = "0x001"
+             filename = "$SCREEN_CONFIG_DIR/Toolbar/toolbar.xml"/>
+
+    <!-- define actual screens below in no particular order -->
+    <Screen_List>
+      <!-- The order of the files.xml is not important.  I followed
+         - the order of the menus.
+       -->
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuSystem/files.xml"/>
+               
+      <Include includeFlag = "0x008"
+               filename = "$SCREEN_CONFIG_DIR/MenuInventory/files.xml"/>
+               
+      <Include includeFlag = "0x020"
+               filename = "$SCREEN_CONFIG_DIR/MenuReceiving/files.xml"/>
+               
+      <Include includeFlag = "0x004"
+               filename = "$SCREEN_CONFIG_DIR/MenuOperations/files.xml"/>
+               
+      <Include includeFlag = "0x010"
+               filename = "$SCREEN_CONFIG_DIR/MenuShipping/files.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuDisplay/files.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuReports/files.xml"/>
+               
+      <Include includeFlag = "0x001"
+               filename = "$SCREEN_CONFIG_DIR/MenuTools/files.xml"/>
+               
+      <Include includeFlag = "0x304"
+               filename = "$SCREEN_CONFIG_DIR/MenuMaintenance/files.xml"/>
+               
+      <Include includeFlag = "0x004"
+               filename = "$SCREEN_CONFIG_DIR/MenuDashboard/files.xml"/>
+
+    </Screen_List>
+
+    <Debug_Screen_List>
+      <Screen commandId = "hmi" count = "1"
+              screenClass = "com.qcsoftware.qcdev.conveyco.ConveCoHMI">
+      </Screen>
+
+      <Screen commandId = "google.com" count = "1"
+              screenClass = "com.qcsoftware.ui.core.FrmWebBrowser">
+        <Params>
+          <param name = "defaultUrl" value = "http://google.com" />
+          <param name = "navigationEnabled" value = "false" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "webscreens" count = "1"
+              screenClass = "com.qcsoftware.ui.core.FrmWebBrowser">
+        <Params>
+          <param name = "defaultUrl" value = "http://localhost:8080" />
+          <param name = "navigationEnabled" value = "true" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "qcsoftware.com" count = "1"
+              screenClass = "com.qcsoftware.ui.core.FrmWebBrowser">
+        <Params>
+          <param name = "connectionId" value = "default" />
+          <param name = "defaultUrl" value = "www.qcsoftware.com" />
+          <param name = "navigationEnabled" value = "false" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "dictionaryloader"
+              count = "1"
+              screenClass = "Gui.Language.FrmDictionaryLoader">
+        <Params>
+          <param name = "connectionId" value = "default" />
+        </Params>
+      </Screen>
+    </Debug_Screen_List>
+
+    <Theme_List>
+      <theme commandId = "plainTheme" themeClass = "Gui.Theme.PlainTheme" />
+      <theme commandId = "aquaticTheme"
+             themeClass = "Gui.Theme.AquaticTheme" />
+      <theme commandId = "basketTheme" themeClass = "Gui.Theme.BasketTheme" />
+      <theme commandId = "blueMarble"
+             themeClass = "Gui.Theme.BlueMarbleTheme" />
+      <theme commandId = "confetti" themeClass = "Gui.Theme.ConfettiTheme" />
+      <theme commandId = "flowers" themeClass = "Gui.Theme.FlowersTheme" />
+      <theme commandId = "garden" themeClass = "Gui.Theme.GardenTheme" />
+      <theme commandId = "kaleidescope"
+             themeClass = "Gui.Theme.KaleidescopeTheme" />
+      <theme commandId = "rainbow" themeClass = "Gui.Theme.RainbowTheme" />
+      <theme commandId = "roses" themeClass = "Gui.Theme.RosesTheme" />
+      <theme commandId = "pastels" themeClass = "Gui.Theme.PastelsTheme" />
+      <theme commandId = "wood" themeClass = "Gui.Theme.WoodTheme" />
+    </Theme_List>
+
+    <HELPSET name = "$PROJECT_BASE/Help/qcHS.hs"  src = "undefined"
+             defaultId = "intro">
+      <HelpView commandId = "mainHelp"  viewName  =  "Operations Guide"
+                mapId = "intro" />
+      <HelpView commandId = "usingHelp" viewName  =  "Using Help"
+                mapId = "helpIntro" />
+    </HELPSET>
+
+    <ABOUT_DIALOG file = "aboutDlg.xml" date = "2018" />
+  </Mainframe>
+</Project>

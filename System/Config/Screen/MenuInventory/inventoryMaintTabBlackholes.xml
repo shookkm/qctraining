@@ -1,0 +1,163 @@
+<!--
+ - Filename:     inventoryMaintTabBlackholes.xml
+ - Description:
+ -
+ - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+ - No part of this copyrighted work may be reproduced, modified, or
+ - distributed in any form or by any means without the prior written
+ - permission of Queen City Software, Inc.
+ -
+ - $Id: inventoryMaintTabBlackholes.xml 9953 2018-03-27 19:48:38Z rlh $
+ - Notes:
+-->
+<inventoryMaintTabBlackholes>
+    <TAB title= "Blackholes">
+      <SPLITPANE divider="160">
+        <FLEXSQLMODIFIERCOMPONENT
+          name="BlackholesFilter"
+          appendAsAnd="false"
+          makeAbsolute="true"
+          autoResize="false"
+          autoExecute="true"
+          labelsOnTop="true"
+          maxFilterRows="7"
+          editorWidth="130"
+          showCheckBoxes="false"
+          filterBorderText="Filter Criteria"
+          filterBorderColor="blue"
+          okButtonText="Execute"
+          passiveMode="false"
+          orientation="vertical">
+
+          <DBCONNECT
+            type="global"
+            connectionId="epicor" />
+
+          <FILTER_OPTION
+            label="Unit"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="UnitType"
+            editorType="combo"
+            autoQuote="true">
+            <COMBO_OPTIONS
+              ifdef="unitTypes"
+              loadEmptyItem="true" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="MasterZoneId"
+            editorType="combo"
+            autoQuote="true">
+            <COMBO_OPTIONS
+              ifdef="masterZoneIds"
+              loadEmptyItem="false" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="ZoneId"
+            editorType="text"
+            autoQuote="true">
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="LocationId"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="StorageId"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="PalletId"
+            editorType="text"
+            autoQuote="true" />
+
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <SPLITPANE divider = "200" 
+                   orientation = "vertical" >
+          <FLEXTABLECOMPONENT name = "BlackholesInventoryTable" 
+                              init = "init" 
+                              records = "500"
+                              greenbar = "true"
+                              refresh = "true"
+                              refreshOnUpdate = "true"
+                              refreshOnInsert = "true"
+                              ignoreEventConcatenation = "true">
+  
+            <DBCONNECT type = "global" />
+              <TRIGGER name = "BlackholesFilter" />
+  
+              <TABLE key = "BlackholesFilter:execute"
+                     title = "Blackholes">
+                <SELECT sql = "call InventoryBlackhole(//MasterZoneId,
+                                                       //ZoneId,
+                                                       //Location,
+                                                       //PalletId,
+                                                       //StorageId,
+                                                       //Unit,
+                                                       //UnitType)" />
+              <ALTVALUES>
+              </ALTVALUES>
+                  
+              <TABLECOLUMNS>                          
+               <TABLECOLUMN name = "LocationId"  
+                            preferredWidth = "80"
+                            maxWidth = "100"/>
+                                                      
+               <TABLECOLUMN name = "CaseCt"  
+                            preferredWidth = "110"
+                            maxWidth = "120"
+                            align = "right"/>
+                            
+               <TABLECOLUMN name = "Qty"  
+                            preferredWidth = "110"
+                            maxWidth = "120"
+                            align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name = "BlackholesInventoryCartons" 
+                              init = "init" 
+                              records = "500"
+                              greenbar = "true"
+                              refresh = "true"
+                              refreshOnUpdate = "true"
+                              refreshOnInsert = "true"
+                              ignoreEventConcatenation = "true">
+  
+            <DBCONNECT type = "global" />
+              <TRIGGER name = "BlackholesInventoryTable" />
+  
+              <TABLE key = "BlackholesInventoryTable:BlackholesFilter:execute"
+                     title = "Pallet Cartons">
+                <SELECT sql = "call InventoryBlackholeDetail(//PalletId, //LocationId)" />
+                
+                                                           
+                <DELETE sql = "call InventoryPalletCartonDelete(/*StorageId,
+                                                                /*LocationId,
+                                                                /*Unit,
+                                                                /*UnitType,
+                                                                '$QC_USER')"/>
+              <ALTVALUES>
+              </ALTVALUES>
+                  
+              <TABLECOLUMNS>                          
+                <TABLECOLUMN name = "Qty"  
+                             preferredWidth = "110"
+                             maxWidth = "120"
+                             align = "right"/>
+              </TABLECOLUMNS>
+  
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+</inventoryMaintTabBlackholes>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     menus.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: menus.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<menuDashboard>
+      <menu commandId = "dashboards" 
+            text="Dashboards" 
+            accelerator= "T" 
+            security="false">
+
+        <menuitem commandId = "testDashboard" 
+                  text = "Test"
+                  handler = "defaultScreen" 
+                  security = "false"/>
+
+        <menuitem commandId = "demoDashboard" 
+                  text = "Demo Dashboard"
+                  handler = "defaultScreen" 
+                  security = "false"/>
+
+        <menuitem commandId = "chartWizzard" 
+                  text = "Chart Wizzard"
+                  handler = "defaultScreen" 
+                  security = "false"/>
+      </menu>
+</menuDashboard>

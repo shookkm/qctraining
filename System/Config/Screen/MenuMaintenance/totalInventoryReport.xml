@@ -1,0 +1,207 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     totalInventoryReport.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: totalInventoryReport.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Total Inventory Report" 
+            height = "700" 
+            width = "1100" 
+            frametype = "internal"
+            report = "true" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" connectionId = "default" setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+  </GLOBAL_DEFINITIONS>
+
+  <REPORTS>
+  </REPORTS>
+
+  <!-- top table is for box descriptions -->
+
+
+  <SPLITPANE divider = "60" 
+             orientation = "vertical">
+    <FLEXSQLMODIFIERCOMPONENT  name = "buildingInventoryFilter"
+                   appendAsAnd = "false"
+                   makeAbsolute = "true"
+                   autoResize = "false"
+                   autoExecute = "true"
+                   labelsOnTop = "false"
+                   maxFilterRows = "1"
+                   editorWidth = "90"
+                   showCheckBoxes = "false"
+                   filterBorderText = "Filter Criteria"
+                   filterBorderColor = "blue"
+                   okButtonText = "Execute"
+                   passiveMode = "true"
+                   orientation = "horizontal"
+                   roundedCorners = "true" >
+
+      <DBCONNECT type = "global" />      
+      <FILTER_OPTION label = "Date"
+                     altValue = "fromDate"
+                     editorType = "calendar"
+                     autoQuote = "true" >
+          <CALENDAR_OPTIONS  pastEnabled = "true" 
+                             deselectEnabled = "true"
+                             monthsPast = "6" 
+                             monthsFuture = "2"
+                             date = "0"
+                             format = "yyyy-MM-dd"/>
+      </FILTER_OPTION>                 
+    </FLEXSQLMODIFIERCOMPONENT>
+             
+    <TABPANE>
+      <TAB  title = "Current">
+        <!-- tab divided for two tables -->
+        <FLEXTABLECOMPONENT name = "currentReport"
+                            init = "current" 
+                            refresh = "true" 
+                            records = "5000"
+                            greenbar = "true">
+
+          <DBCONNECT type = "global" />
+                  <!-- the key in table supplies the key for remaining sql -->
+          <TABLE key = "current"
+                 title = "Current">
+            <SELECT sql = "  select Unit,
+                                    UnitType,
+                                    coalesce(invQty, 0) InvQty,
+                                    coalesce(kitQty, 0) KitQty,
+                                    coalesce(totalQty, 0) TotalQty,
+                                    coalesce(wipQty, 0) WipQty,
+                                    coalesce(wipKitQty, 0) WipKitQty,
+                                    coalesce(wipTotal, 0) WipTotal,
+                                    TotalQty + WipTotal TotalInvQty
+                               from TotalBuildingInventoryView
+                               order by Unit"/>
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "OnHold"   
+                           align = "right"/>
+              <TABLECOLUMN name = "InvQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "KitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipKitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipTotal"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalInvQty"   
+                           align = "right"/>
+            </TABLECOLUMNS>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </TAB>
+      
+      <TAB  title = "Current Day">
+        <!-- tab divided for two tables -->
+        <FLEXTABLECOMPONENT name = "OrderStatsAvgTable"
+                            init = "desc" 
+                            refresh = "true" 
+                            records = "5000"
+                            greenbar = "true">
+
+          <DBCONNECT type = "global" />
+                  <!-- the key in table supplies the key for remaining sql -->
+          <TRIGGER name = "buildingInventoryFilter" />
+          <TABLE key = "buildingInventoryFilter:execute"
+                 title = "Day Average">
+            <SELECT sql = "call DailyTotalBuildingInventoryGet(//fromDate, 0)"/>
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Day"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "OnHold"   
+                           align = "right"/>
+              <TABLECOLUMN name = "InvQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "KitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipKitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipTotal"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalInvQty"   
+                           align = "right"/>
+            </TABLECOLUMNS>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </TAB>
+      
+      <TAB  title = "Yesterday">
+        <!-- tab divided for two tables -->
+        <FLEXTABLECOMPONENT name = "OrderStatsAvgTableDay2"
+                            init = "desc" 
+                            refresh = "true" 
+                            records = "5000"
+                            greenbar = "true">
+
+          <DBCONNECT type = "global" />
+                  <!-- the key in table supplies the key for remaining sql -->
+          <TRIGGER name = "buildingInventoryFilter" />
+          <TABLE key = "buildingInventoryFilter:execute"
+                 title = "Day Average">
+            <SELECT sql = "call DailyTotalBuildingInventoryGet(//fromDate, -1)"/>
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Day"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           align = "left"/>
+              <TABLECOLUMN name = "OnHold"   
+                           align = "right"/>
+              <TABLECOLUMN name = "InvQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "KitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipKitQty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "WipTotal"   
+                           align = "right"/>
+              <TABLECOLUMN name = "TotalInvQty"   
+                           align = "right"/>
+            </TABLECOLUMNS>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </TAB>
+    </TABPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

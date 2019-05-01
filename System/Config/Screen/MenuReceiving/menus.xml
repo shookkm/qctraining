@@ -1,0 +1,25 @@
+<!--
+ - Filename:     menus.xml
+ - Description:
+ -
+ - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+ - No part of this copyrighted work may be reproduced, modified, or
+ - distributed in any form or by any means without the prior written
+ - permission of Queen City Software, Inc.
+ -
+ - $Id: menus.xml 9911 2018-03-15 14:20:24Z rlh $
+ - Notes:
+-->
+<menuReceiving>
+      <menu commandId   = "receiving"
+            text        = "Receiving">
+        <menuitem commandId = "asn"
+                  text      = "POs"
+                  handler   = "defaultScreen" />
+        <Include includeFlag = "0x001"
+                 filename = "$SCREEN_CONFIG_DIR/MenuReceiving/menuItemTruckSchedule.xml"/>
+        <menuitem commandId = "openPOs"
+                  text      = "Open PO Lines Report"
+                  handler   = "defaultScreen" />
+      </menu>
+</menuReceiving>

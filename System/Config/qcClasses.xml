@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     qcClasses.xml
+   - Description:
+   -
+   - (c) COPYRIGHT Queen City Software, Inc. 2014 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of Queen City Software, Inc.
+   -
+   - $Id: qcClasses.xml 1172 2018-10-17 23:49:53Z tds $
+   - Notes:
+  -->
+<QcClasses>
+
+<!-- WorkOrderTypes.Order -->
+  <QcClass type = "WorkOrderTypes"
+           key = "FOL"
+           attribute = "Order"
+           class = "Packages.OrderMgmt.PickWorkOrders" />
+
+  <QcClass type = "WorkOrderTypes"
+           key = "EOL"
+           attribute = "Order"
+           class = "Packages.OrderMgmt.PickWorkOrders" />
+           
+  <QcClass type = "WorkOrderTypes"
+             key = "BIN"
+             attribute = "Order"
+             class = "Packages.OrderMgmt.PickWorkOrders" />
+             
+  <!-- WorkOrderTypes.OrderRelease -->
+  <QcClass type = "WorkOrderTypes"
+             key = "FOL"
+             attribute = "OrderRelease"
+             class = "Packages.OrderMgmt.Releasers.OrderGenericRelease" />
+      
+  <QcClass type = "WorkOrderTypes"
+             key = "EOL"
+             attribute = "OrderRelease"
+             class = "Packages.OrderMgmt.Releasers.OrderGenericRelease" />
+             
+  <QcClass type = "WorkOrderTypes"
+             key = "BIN"
+             attribute = "OrderRelease"
+             class = "Packages.OrderMgmt.Releasers.OrderGenericRelease" />
+           
+<!-- WorkOrderTypes.OrderLine -->
+  <QcClass type = "WorkOrderTypes"
+           key = "FOL"
+           attribute = "OrderLine"
+           class = "Packages.OrderMgmt.PickWorkOrderLines" />
+           
+  <QcClass type = "WorkOrderTypes"
+           key = "EOL"
+           attribute = "OrderLine"
+           class = "Packages.OrderMgmt.PickWorkOrderLines" />
+           
+  <QcClass type = "WorkOrderTypes"
+           key = "BIN"
+           attribute = "OrderLine"
+           class = "Packages.OrderMgmt.PickWorkOrderLines" />
+           
+  <!-- WorkOrderTypes.LineRelease -->
+  <QcClass type = "WorkOrderTypes"
+             key = "FOL"
+             attribute = "LineRelease"
+             class = "Packages.OrderMgmt.Releasers.PickOperationSetPlanned" />
+      
+  <QcClass type = "WorkOrderTypes"
+             key = "EOL"
+             attribute = "LineRelease"
+             class = "Packages.OrderMgmt.Releasers.PickOperationSetPlanned" />
+             
+  <QcClass type = "WorkOrderTypes"
+             key = "BIN"
+             attribute = "LineRelease"
+             class = "Packages.OrderMgmt.Releasers.PickOperationSetPlanned" />
+           
+  <!-- WorkOrderTypes.OrderLineOperation -->
+  <QcClass
+    type="WorkOrderTypes"
+    key="FOL"
+    attribute="OrderLineOperation"
+    class="Packages.OrderMgmt.PickWorkOrderLineOperations" />
+
+  <QcClass
+    type="WorkOrderTypes"
+    key="FOL"
+    attribute="OrderLineOperation"
+    class="Packages.OrderMgmt.PickWorkOrderLineOperations" />
+    
+  <QcClass
+    type="WorkOrderTypes"
+    key="BIN"
+    attribute="OrderLineOperation"
+    class="Packages.OrderMgmt.PickWorkOrderLineOperations" />
+
+</QcClasses>

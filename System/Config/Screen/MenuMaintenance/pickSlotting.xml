@@ -1,0 +1,586 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     pickSlotting.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: pickSlotting.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Forward Pick Slotting" 
+            height = "400" 
+            width = "1050" 
+            frametype = "internal"
+            report = "true" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "locationStatesMap"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView 
+                            where mnemonicType = 'LOCATION_STATES' 
+                            order by idx" />
+
+    <VECTORMAP name = "locationStatusesMap"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView 
+                            where mnemonicType = 'LOCATION_STATUSES' 
+                            order by idx" />
+
+    <VECTOR name = "locationStates"
+            loadSql = "select returnCodeMsg
+                         from MnemonicCodesView 
+                        where mnemonicType = 'LOCATION_STATES' 
+                        order by idx" />
+
+    <VECTOR name = "locationStatuses"
+            loadSql = "select returnCodeMsg
+                         from MnemonicCodesView 
+                        where mnemonicType = 'LOCATION_STATUSES' 
+                        order by idx" />
+                                
+    <VECTOR name = "zoneList"
+            loadSql = "select '' zoneId 
+                           union 
+                           select distinct zoneId 
+                           from AcceptableStorageUnitsView 
+                           order by zoneId" />
+                           
+    <VECTOR name = "unitTypes">
+      <ITEM value = "EACH" />
+      <ITEM value = "KIT_BOX" />
+    </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <TABPANE>
+    <TAB title="View 01">
+      <SPLITPANE  divider = "170">
+        <FLEXSQLMODIFIERCOMPONENT name = "SlottingUpdateFilter"
+                                  appendAsAnd = "false"
+                                  makeAbsolute = "true"
+                                  autoResize = "false"
+                                  autoExecute = "true"
+                                  labelsOnTop = "true"
+                                  maxFilterRows = "5"
+                                  editorWidth = "120"
+                                  showCheckBoxes = "false"
+                                  filterBorderText = "Filter Criteria"
+                                  filterBorderColor = "blue"
+                                  okButtonText = "Execute"
+                                  passiveMode = "false"
+                                  orientation = "vertical">
+                                   
+          <FILTER_OPTION label = "Zone" 
+                         altValue = "zoneId01" 
+                         editorType = "combo" 
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zoneList" />      
+          </FILTER_OPTION>
+                             
+          <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId01" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+      
+          <FILTER_OPTION label = "Sku"
+                         altValue = "unit01"
+                         editorType = "text"
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Show Only Holes" 
+                         altValue = "holes01" 
+                         editorType = "combo" 
+                         autoQuote = "true" >
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "" />
+              <COMBO_OPTION value = "False" />
+              <COMBO_OPTION value = "True" />
+            </COMBO_OPTIONS>
+          </FILTER_OPTION>
+
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "SlottingTable01" 
+                              init = "init" 
+                              refresh = "true" 
+                              refreshOnUpdate = "true"
+                              refreshOnInsert = "true"
+                              greenbar = "true"
+                              records = "25"
+                              ignoreEventConcatenation = "true">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "SlottingUpdateFilter" />
+          <InsertInterpreter>
+            <Field name = "Location" 
+                   searchField = "Location" 
+                   searchTable = "true" />
+          </InsertInterpreter>
+           
+          <TABLE key = "SlottingUpdateFilter:execute" >
+            <SELECT sql = "call SlottingScreenEx(null, 
+                                                 //zoneId01,
+                                                 //locationId01, 
+                                                 //unit01,
+                                                 //holes01,
+                                                 'False')" />
+                                                   
+
+            <UPDATE sql = "call LaMiForwardSlottingUpdateEx(/*LocationId,            
+                                                            //Unit,
+                                                            //UnitType,
+                                                            null,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />
+                                                             
+            <INSERT sql = "call LamiForwardSlottingInsertEx(/*LocationId,
+                                                            //Unit,
+                                                            //UnitType,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />                                            
+                                                            
+            <DELETE sql = "call LaMiForwardSlottingDeleteEx(/*LocationId,
+                                                            /*Unit,
+                                                            /*UnitType)" />                                            
+            <ALTVALUES>
+              <FIELD name = "Status" 
+                       ifdef = "locationStatusesMap" />
+              <FIELD name = "State" 
+                       ifdef = "locationStatesMap" />
+            </ALTVALUES>
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "MasterZoneId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "ZoneId"   
+                           preferredWidth = "70"
+                           maxWidth = "80"/>
+              <TABLECOLUMN name = "LocationId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "100"
+                           maxWidth = "110"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           maxWidth = "75"/>
+              <TABLECOLUMN name = "Qty"   
+                           preferredWidth = "45"
+                           maxWidth = "50"                
+                           align = "right"/>
+              <TABLECOLUMN name = "MaxQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "MinQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "Status"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "State"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "Hole"   
+                           preferredWidth = "45"
+                           maxWidth = "50"/>
+            </TABLECOLUMNS>
+            
+            <EDITOR restoreHide = "true">
+             <FIELD name = "Location">
+                 <TEXTFIELD cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "Unit">
+                <TEXTFIELD cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "UnitType">
+                <COMBO ifdef = "unitTypes" />
+              </FIELD>
+
+              <FIELD name = "MaxQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "MinQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "Status">
+                <COMBO editable = "false" 
+                       ifdef = "locationStatuses" />
+              </FIELD>
+
+              <FIELD name = "State">
+                <COMBO editable = "false" 
+                       ifdef = "locationStates" />
+              </FIELD>
+            </EDITOR>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </SPLITPANE>
+    </TAB>
+    
+    <TAB title="View 02">
+      <SPLITPANE  divider = "170">
+        <FLEXSQLMODIFIERCOMPONENT name = "SlottFilter02"
+                                  appendAsAnd = "false"
+                                  makeAbsolute = "true"
+                                  autoResize = "false"
+                                  autoExecute = "true"
+                                  labelsOnTop = "true"
+                                  maxFilterRows = "5"
+                                  editorWidth = "120"
+                                  showCheckBoxes = "false"
+                                  filterBorderText = "Filter Criteria"
+                                  filterBorderColor = "blue"
+                                  okButtonText = "Execute"
+                                  passiveMode = "false"
+                                  orientation = "vertical">
+                                   
+                                   
+          <FILTER_OPTION label = "Zone" 
+                         altValue = "zoneId02" 
+                         editorType = "combo" 
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zoneList" />      
+          </FILTER_OPTION>
+                             
+          <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId02" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+      
+          <FILTER_OPTION label = "Sku"
+                         altValue = "unit02"
+                         editorType = "text"
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Show Only Holes" 
+                         altValue = "holes02" 
+                         editorType = "combo" 
+                         autoQuote = "true" >
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "" />
+              <COMBO_OPTION value = "False" />
+              <COMBO_OPTION value = "True" />
+            </COMBO_OPTIONS>
+          </FILTER_OPTION>
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "SlottingTable02" 
+                              init = "init" 
+                              refresh = "true" 
+                              refreshOnUpdate = "true"
+                              greenbar = "true"
+                              records = "25"
+                              ignoreEventConcatenation = "true">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "SlottFilter02" />
+          <InsertInterpreter>
+            <Field name = "Location" 
+                   searchField = "Location" 
+                   searchTable = "true" />
+          </InsertInterpreter>
+
+          <TABLE key = "SlottFilter02:execute" >
+            <SELECT sql = "call SlottingScreenEx(null,
+                                                   //zoneId02, 
+                                                   //locationId02, 
+                                                   //unit02,
+                                                   //holes02,
+                                                   //'False')" />
+
+            <UPDATE sql = "call LaMiForwardSlottingUpdateEx(/*LocationId,            
+                                                            //Unit,
+                                                            //UnitType,
+                                                            null,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />
+                                                          
+            <INSERT sql = "call LamiForwardSlottingInsertEx(/*LocationId,
+                                                            //Unit,
+                                                            //UnitType,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />                                            
+                                                            
+            <DELETE sql = "call LaMiForwardSlottingDeleteEx(/*LocationId,
+                                                            /*Unit,
+                                                            /*UnitType)" />                                            
+            <ALTVALUES>
+              <FIELD name = "Status" 
+                       ifdef = "locationStatusesMap" />
+              <FIELD name = "State" 
+                       ifdef = "locationStatesMap" />
+            </ALTVALUES>
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "MasterZoneId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "ZoneId"   
+                           preferredWidth = "70"
+                           maxWidth = "80"/>
+              <TABLECOLUMN name = "LocationId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "100"
+                           maxWidth = "110"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           maxWidth = "75"/>
+              <TABLECOLUMN name = "Qty"   
+                           preferredWidth = "45"
+                           maxWidth = "50"                
+                           align = "right"/>
+              <TABLECOLUMN name = "MaxQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "MinQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "Status"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "State"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "Hole"   
+                           preferredWidth = "45"
+                           maxWidth = "50"/>
+            </TABLECOLUMNS>
+            
+            <EDITOR restoreHide = "true">
+            
+              <FIELD name = "Location">
+                <TEXTFIELD cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "Unit">
+                <NOTIFICATIONTEXTFIELD name = "ptlSkuText" 
+                                       cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "UnitType">
+                <COMBO ifdef = "unitTypes" />
+              </FIELD>
+
+              <FIELD name = "MaxQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "MinQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "Status">
+                <COMBO editable = "false" 
+                       ifdef = "locationStatuses" />
+              </FIELD>
+
+              <FIELD name = "State">
+                <COMBO editable = "false" 
+                       ifdef = "locationStates" />
+              </FIELD>
+            </EDITOR>
+          </TABLE>
+        </FLEXTABLECOMPONENT>        
+      </SPLITPANE>
+    </TAB>
+
+    <TAB title="View 03">
+      <SPLITPANE  divider = "170">
+        <FLEXSQLMODIFIERCOMPONENT name = "SlottFilter03"
+                                  appendAsAnd = "false"
+                                  makeAbsolute = "true"
+                                  autoResize = "false"
+                                  autoExecute = "true"
+                                  labelsOnTop = "true"
+                                  maxFilterRows = "5"
+                                  editorWidth = "120"
+                                  showCheckBoxes = "false"
+                                  filterBorderText = "Filter Criteria"
+                                  filterBorderColor = "blue"
+                                  okButtonText = "Execute"
+                                  passiveMode = "false"
+                                  orientation = "vertical">
+                                                                    
+          <FILTER_OPTION label = "Zone" 
+                         altValue = "zoneId03" 
+                         editorType = "combo" 
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zoneList" />      
+          </FILTER_OPTION>
+                             
+          <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId03" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+      
+          <FILTER_OPTION label = "Sku"
+                         altValue = "unit03"
+                         editorType = "text"
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Show Only Holes" 
+                         altValue = "holes03" 
+                         editorType = "combo" 
+                         autoQuote = "true" >
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "" />
+              <COMBO_OPTION value = "False" />
+              <COMBO_OPTION value = "True" />
+            </COMBO_OPTIONS>
+          </FILTER_OPTION>
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "SlottingTable03" 
+                              init = "init" 
+                              refresh = "true" 
+                              refreshOnUpdate = "true"
+                              greenbar = "true"
+                              records = "25"
+                              ignoreEventConcatenation = "true">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "SlottFilter03" />
+          <InsertInterpreter>
+            <Field name = "Location" 
+                   searchField = "Location" 
+                   searchTable = "true" />
+          </InsertInterpreter>
+
+          <TABLE key = "SlottFilter03:execute" >
+            <SELECT sql = "call SlottingScreenEx(null,
+                                                 //zoneId03, 
+                                                 //locationId03, 
+                                                 //unit03,
+                                                 //holes03,
+                                                 //'False')" />
+
+            <UPDATE sql = "call LaMiForwardSlottingUpdateEx(/*LocationId,            
+                                                            //Unit,
+                                                            //UnitType,
+                                                            null,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />
+                                                                                                                  
+            <INSERT sql = "call LamiForwardSlottingInsertEx(/*LocationId,
+                                                            //Unit,
+                                                            //UnitType,
+                                                            //MaxQty,
+                                                            //MinQty,
+                                                            '$QC_USER')" />                                            
+                                                            
+            <DELETE sql = "call LaMiForwardSlottingDeleteEx(/*LocationId,
+                                                            /*Unit,
+                                                            /*UnitType)" />                                            
+            <ALTVALUES>
+              <FIELD name = "Status" 
+                       ifdef = "locationStatusesMap" />
+              <FIELD name = "State" 
+                       ifdef = "locationStatesMap" />
+            </ALTVALUES>
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "MasterZoneId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "ZoneId"   
+                           preferredWidth = "70"
+                           maxWidth = "80"/>
+              <TABLECOLUMN name = "LocationId"   
+                           preferredWidth = "90"
+                           maxWidth = "100"/>
+              <TABLECOLUMN name = "Unit"   
+                           preferredWidth = "100"
+                           maxWidth = "110"/>
+              <TABLECOLUMN name = "UnitType"   
+                           preferredWidth = "70"
+                           maxWidth = "75"/>
+              <TABLECOLUMN name = "Qty"   
+                           preferredWidth = "45"
+                           maxWidth = "50"                
+                           align = "right"/>
+              <TABLECOLUMN name = "MaxQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "MinQty"  
+                           preferredWidth = "55"
+                           maxWidth = "60"                
+                           align = "right" />
+              <TABLECOLUMN name = "Status"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "State"   
+                           preferredWidth = "65"
+                           maxWidth = "70"/>
+              <TABLECOLUMN name = "Hole"   
+                           preferredWidth = "45"
+                           maxWidth = "50"/>
+            </TABLECOLUMNS>
+            
+            <EDITOR restoreHide = "true">
+              <FIELD name = "LocationId">
+                <TEXTFIELD cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "Unit">
+                <NOTIFICATIONTEXTFIELD name = "ptlSkuText" 
+                                       cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "UnitType">
+                <COMBO ifdef = "unitTypes" />
+              </FIELD>
+
+              <FIELD name = "MaxQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "MinQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "Status">
+                <COMBO editable = "false" 
+                       ifdef = "locationStatuses" />
+              </FIELD>
+
+              <FIELD name = "State">
+                <COMBO editable = "false" 
+                       ifdef = "locationStates" />
+              </FIELD>
+            </EDITOR>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </SPLITPANE>
+    </TAB>    
+  </TABPANE>
+</FLEXSCREEN>

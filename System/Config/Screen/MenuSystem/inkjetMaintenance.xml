@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     inkjetMaintenance.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: inkjetMaintenance.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Ink Jet Maintenance" height = "350" width = "750"
+            frametype = "internal"
+            updateSecurity = "inkjetMaint.edit"
+            insertSecurity = "inkjetMaint.edit"
+            deleteSecurity = "inkjetMaint.edit" >
+
+  <DBCONNECT type = "predefined"
+             connectionId = "default"
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+
+    <VECTOR name = "inkjetStatuses"
+            loadSql = "select returnCodeMsg
+                         from mnemonicCodesView
+                        where mnemonicType = 'INKJET_PRINTER_STATUSES'
+                        order by idx"/>
+
+    <VECTORMAP name = "inkjetStatusesMap"
+               loadSql = "select idx, returnCodeMsg
+                            from mnemonicCodesView
+                           where mnemonicType = 'INKJET_PRINTER_STATUSES'"/>
+
+    <VECTOR name = "scannerIds"
+            loadSql = "select scannerId
+                         from scannerToPlc
+                        order by scannerId"/>
+
+    <VECTORMAP name    = "inkjetFlagsMap"
+               loadSql = "select returnCodeMsg, idx
+                            from MnemonicCodesView
+                           where mnemonicType = 'INKJET_PRINTER_FLAGS'
+                           order by idx"/>
+
+  </GLOBAL_DEFINITIONS>
+
+  <FLEXTABLECOMPONENT name = "Ink Jet Printers" init = "InkJetTable" refresh = "true"
+                      greenbar = "true" >
+
+    <DBCONNECT type = "global" />
+
+    <TABLE key="InkJetTable">
+
+      <SELECT sql = "select ScannerId, Hostname, Status, Flags
+                       from InkJetPrinter
+                      order by scannerId"/>
+
+      <DELETE sql = "delete from InkJetPrinter where scannerId = //ScannerId"/>
+      <INSERT sql = "insert into InkJetPrinter(scannerId, hostname, status, flags)
+                                 values(//ScannerId, //Hostname, //Status, //Flags)"/>
+      <UPDATE sql = "update InkJetPrinter
+                        set hostname = //Hostname,
+                            status = //Status,
+                            flags = //FlagBits
+                      where scannerId = //ScannerId"/>
+
+      <TABLECOLUMNS>
+        <TABLECOLUMN name = "Status" preferredWidth = "35"/>
+      </TABLECOLUMNS>
+
+      <ALTVALUES>
+        <FIELD name = "Status" ifdef = "inkjetStatusesMap"/>
+      </ALTVALUES>
+
+      <EDITOR restoreHide = "true" title = "Ink Jet Editor">
+
+        <FIELD name = "ScannerId">
+          <COMBO editable = "false" ifdef = "scannerIds" />
+        </FIELD>
+
+        <FIELD name = "Hostname" required = "true">
+          <TEXTFIELD cutpaste = "true"/>
+        </FIELD>
+
+        <FIELD name = "Status">
+          <COMBO editable = "false" ifdef = "inkjetStatuses" />
+        </FIELD>
+
+        <FIELD name = "Flags">
+          <POPUPBITVALUEEDITOR>
+            <BIT_VALUES ifdef = "inkjetFlagsMap"/>
+          </POPUPBITVALUEEDITOR>
+        </FIELD>
+      </EDITOR>
+    </TABLE>
+
+    <InsertInterpreter>
+      <Field name = "Flags"
+             searchField = ""
+             defaultValue = "0"
+             searchTable = "false"
+             searchParent = "false"/>
+    </InsertInterpreter>
+  </FLEXTABLECOMPONENT>
+</FLEXSCREEN>

@@ -1,0 +1,364 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     scannerLog.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: scannerLog.xml 10572 2018-08-17 20:22:15Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN
+  title="Scanner Log"
+  height="600"
+  width="1200"
+  frametype="internal"
+  report="false"
+  globalThreading="true">
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT
+    type="predefined"
+    connectionId="default"
+    setglobal="true" />
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP
+      name="containerLogCodes"
+      loadSql="select ReturnCodeMsg, 
+                      MnemonicCode
+                 from MnemonicCodesView
+                 where mnemonicType = 'CONTAINER_LOG_STATUSES'
+                   and idx != 0
+                 order by ReturnCodeMsg" />
+
+    <VECTORMAP
+      name="containerStatuses"
+      loadSql= "select Idx, 
+                       ReturnCodeMsg
+                  from MnemonicCodesView
+                  where MnemonicType = 'CONTAINER_LOG_STATUSES'
+                  order by ReturnCodeMsg" />
+
+    <VECTORMAP
+      name="routeStatuses"
+      loadSql= "select Idx, 
+                       ReturnCodeMsg
+                  from MnemonicCodesView
+                  where MnemonicType = 'ORDER_STATUSES'
+                  order by ReturnCodeMsg" />
+
+    <VECTORMAP
+      name="scannerIds"
+      loadSql= "select si.Description, 
+                       stp.ScannerId
+                  from ScannerToPlc stp
+                  join SorterIds si
+                    on si.SorterId = stp.SorterId
+                   and si.DisplayRoutes != 0
+                  order by si.DisplayRoutes" />
+
+    <VECTORMAP
+      name="areaIds"
+      loadSql= "select description, 
+                       areaId
+                  from SorterAreas
+                  order by displayOrder" />
+
+    <VECTORMAP name="orderBy">
+      <ITEM
+        key="InsertTs Desc"
+        value="Order by InsertTs desc" />
+      <ITEM
+        key="InsertTs Asc"
+        value="Order by InsertTs asc" />
+    </VECTORMAP>
+  </GLOBAL_DEFINITIONS>
+
+  <BORDER_COMPONENT orientation="south">
+    <ACTIVITY_PANEL
+      labelColor="red"
+      messageColor="blue">
+      <SOURCE sourceName="ContainerLogTable" />
+      <SOURCE sourceName="ContainerLogLowerTableLeft" />
+      <SOURCE sourceName="ContainerLogLowerTableRight" />
+    </ACTIVITY_PANEL>
+  </BORDER_COMPONENT>
+
+  <REPORTS
+    preview="true"
+    records="1000">
+    <DBCONNECT type="global" />
+  </REPORTS>
+
+  <SPLITPANE
+    divider="120"
+    orientation="vertical">
+    <FLEXSQLMODIFIERCOMPONENT
+      name="ContainerLogFilter"
+      appendAsAnd="false"
+      makeAbsolute="true"
+      autoResize="false"
+      autoExecute="true"
+      labelsOnTop="false"
+      maxFilterRows="3"
+      editorWidth="150"
+      showCheckBoxes="false"
+      filterBorderText="Filter Criteria"
+      filterBorderColor="blue"
+      okButtonText="Execute"
+      passiveMode="false"
+      orientation="horizontal"
+      roundedCorners="true">
+
+      <DBCONNECT
+        type="global"
+        connectionId="default" />
+
+      <FILTER_OPTION
+        label="AreaId"
+        altValue="AreaId"
+        editorType="combo"
+        autoQuote="true">
+        <COMBO_OPTIONS
+          ifdef="areaIds"
+          loadEmptyItem="true" />
+      </FILTER_OPTION>
+
+      <FILTER_OPTION
+        label="ScannerId"
+        altValue="ScannerId"
+        editorType="combo"
+        autoQuote="true">
+        <COMBO_OPTIONS
+          ifdef="scannerIds"
+          loadEmptyItem="true" />
+      </FILTER_OPTION>
+
+      <FILTER_OPTION
+        label="ContainerId"
+        altValue="ContainerId"
+        editorType="text"
+        autoQuote="true" />
+
+      <FILTER_OPTION
+        label="AssignedStatus"
+        altValue="AssignedStatus"
+        editorType="combo"
+        autoQuote="true">
+        <COMBO_OPTIONS
+          ifdef="containerLogCodes"
+          loadEmptyItem="true" />
+      </FILTER_OPTION>
+
+      <FILTER_OPTION
+        label="SortedStatus"
+        altValue="SortedStatus"
+        editorType="combo"
+        autoQuote="true">
+        <COMBO_OPTIONS
+          ifdef="containerLogCodes"
+          loadEmptyItem="true" />
+      </FILTER_OPTION>
+
+      <FILTER_OPTION
+        label="FromDate"
+        altValue="FromDate"
+        editorType="calendar"
+        autoQuote="true">
+        <CALENDAR_OPTIONS
+          pastEnabled="true"
+          deselectEnabled="true"
+          monthsPast="6"
+          monthsFuture="0"
+          date="0"
+          format="yyyy-MM-dd" />
+      </FILTER_OPTION>
+
+      <FILTER_OPTION
+        label="FromTime"
+        altValue="FromTime"
+        editorType="text"
+        autoQuote="true" />
+
+      <FILTER_OPTION
+        label="LaneNo"
+        altValue="LaneNo"
+        editorType="text"
+        autoQuote="true" />
+
+      <FILTER_OPTION
+        label="ORDER_BY"
+        altValue="OrderBy"
+        editorType="combo"
+        autoQuote="true">
+        <COMBO_OPTIONS ifdef="orderBy" />
+      </FILTER_OPTION>
+    </FLEXSQLMODIFIERCOMPONENT>
+
+    <SPLITPANE
+      divider="270"
+      orientation="vertical">
+      <FLEXTABLECOMPONENT
+        name="ContainerLogTable"
+        init="init"
+        refresh="true"
+        greenbar="true"
+        ignoreEventConcatenation="true">
+
+        <DBCONNECT type="global" />
+        <TRIGGER name="ContainerLogFilter" />
+
+        <TABLE key="ContainerLogFilter:execute">
+          <SELECT
+            sql="call ContainerLogScreen(//AssignedStatus,
+                                         //SortedStatus,
+                                         //ScannerId,
+                                         //ContainerId,
+                                         //LaneNo,
+                                         //FromDate,
+                                         //FromTime,
+                                         //OrderBy,
+                                         'Y',
+                                         //AreaId)" />
+
+          <ALTVALUES>
+            <FIELD
+              name="AssignedStatus"
+              ifdef="containerStatuses" />
+            <FIELD
+              name="SortedStatus"
+              ifdef="containerStatuses" />
+          </ALTVALUES>
+
+          <TABLECOLUMNS>
+            <TABLECOLUMN
+              name="ScannerId"
+              width="90"
+              preferredWidth="90"
+              maxWidth="90" />
+
+            <TABLECOLUMN
+              name="InsertTs"
+              width="130"
+              preferredWidth="130"
+              maxWidth="170" />
+
+            <TABLECOLUMN
+              name="SequenceNo"
+              align="right"
+              maxWidth="150" />
+
+            <TABLECOLUMN
+              name="LaneNo"
+              align="right"
+              maxWidth="50" />
+
+            <TABLECOLUMN
+              name="SecondaryLaneNo"
+              align="right"
+              maxWidth="100" />
+
+            <TABLECOLUMN
+              name="SortedLaneNo"
+              align="right"
+              maxWidth="100" />
+
+            <TABLECOLUMN
+              name="Ts"
+              hide="true" />
+            <TABLECOLUMN
+              name="AssignedTs"
+              hide="true" />
+            <TABLECOLUMN
+              name="SortedTs"
+              hide="true" />
+            <TABLECOLUMN
+              name="LookupTime"
+              hide="true" />
+            <TABLECOLUMN
+              name="RouteData"
+              hide="true" />
+          </TABLECOLUMNS>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+
+      <SPLITPANE
+        divider="600"
+        orientation="horizontal">
+        <FLEXTABLECOMPONENT
+          name="ContainerLogLowerTableLeft"
+          greenbar="true">
+          <TRIGGER name="ContainerLogTable" />
+          <DBCONNECT type="global" />
+
+          <TABLE key="ContainerLogTable:ContainerLogFilter:execute">
+            <SELECT sql="call ContainerLogRouteData(//RouteData)" />
+
+            <ALTVALUES>
+              <FIELD
+                name="Status"
+                ifdef="routeStatuses" />
+            </ALTVALUES>
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN
+                name="Priority"
+                align="right" />
+            </TABLECOLUMNS>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+
+        <SPLITPANE
+          divider="60"
+          orientation="vertical">
+          <FLEXTABLECOMPONENT
+            name="ContainerLogLowerTableRight"
+            greenbar="true">
+            <TRIGGER name="ContainerLogTable" />
+            <DBCONNECT type="global" />
+
+            <TABLE key="ContainerLogTable:ContainerLogFilter:execute">
+              <SELECT
+                sql="call ContainerLogData(//RouteData)" />
+              <TABLECOLUMNS>
+                <TABLECOLUMN
+                  name="CalculatedWeight"
+                  align="right"/>
+                <TABLECOLUMN
+                  name="Weight"
+                  align="right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+
+          <FLEXTABLECOMPONENT
+            name="ContainerLogLowerTableRightLow"
+            greenbar="true">
+            <TRIGGER name="ContainerLogTable" />
+            <DBCONNECT type="global" />
+
+            <TABLE key="ContainerLogTable:ContainerLogFilter:execute">
+              <SELECT
+                sql="select AssignedTs,
+                            SortedTs,
+                            datediff(millisecond, insertTs, assignedTs) LookupTime
+                        from containerLog
+                        where scannerId = //[ScannerId]
+                          and insertTs = //[InsertTs]" />
+              <TABLECOLUMNS>
+                <TABLECOLUMN
+                  name="LookupTime"
+                  align="right"
+                  maxWidth="60" />
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </SPLITPANE>
+      </SPLITPANE>
+    </SPLITPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

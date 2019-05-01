@@ -1,0 +1,236 @@
+<?xml version="1.0"?>
+
+<!--
+ - Filename:     cycleCountCreate.xml
+ - Description:
+ -
+ - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+ - No part of this copyrighted work may be reproduced, modified, or
+ - distributed in any form or by any means without the prior written
+ - permission of Queen City Software, Inc.
+ -
+ - $Id: cycleCountCreate.xml 9887 2018-03-07 18:58:07Z rlh $
+ - Notes:
+-->
+<!--DOCTYPE FLEXSCREEN SYSTEM "flexscreen.dtd" -->
+
+<!--
+this is xml for a new generic cycle count create screen.
+-->
+
+
+<FRMCYCLECOUNTCREATE title = "Cycle Count Create" 
+                     panelHeight = "352"
+                     panelWidth = "480">
+
+  <GLOBAL_DEFINITIONS>
+
+  </GLOBAL_DEFINITIONS>         
+
+  <!-- Enter the project specific stored procedure for creating a cycle count -->
+  <STORED_PROC name = "CycleCountEnhancedCreateEx">
+
+    <!-- Enter all parameters, parameter name should match the name of the component
+         that will be used to set the parameter value..
+         Order starts at 1 and needs to be specified for each parameter -->
+             
+    <PARAM name = "sku"
+           order = "1" />
+
+    <PARAM name = "locationFrom"
+           order = "2" />
+           
+    <PARAM name = "locationTo"
+           order = "3" />       
+           
+    <PARAM name = "calFrom"
+           order = "4" />
+           
+    <PARAM name = "calTo"
+           order = "5" />
+           
+    <PARAM name = "qtyFrom"
+           order = "6" />
+           
+    <PARAM name = "qtyTo"
+           order = "7" />
+          
+    <PARAM name = "chkInvDiscrepant"
+           order = "8" />
+
+    <PARAM name = "chkLocDiscrepant"
+           order = "9" />          
+           
+    <PARAM name = "cycleCountOrder"
+           order = "10" />
+
+    <PARAM name = "storageId"
+           order = "11" />
+
+    <PARAM name = "masterZoneId"
+           order = "12" />
+           
+    <PARAM name = "zoneId"
+           order = "13" />
+           
+    <PARAM name = "isEmptyStorage"
+           order = "14" />
+
+    <!-- Parameter must be named operator if the current operator is needed for
+         the stored procedure -->
+    <PARAM name = "operator"
+           order = "15" />
+           
+  </STORED_PROC>
+  
+  <CANCEL_PROC name = "CancelOpexDuplicates" />
+  
+  <COMPONENTS>
+     
+    <!-- start listing the components
+         certain attributes are always required by flex options components
+         like name, bounds, type -->
+
+    <LABEL text = "SKU"
+           bounds = "20, 30, 100, 25" />
+                            
+    <TEXTFIELD name = "sku"
+               bounds = "140, 30, 130, 25" />
+ 
+    <LABEL text = "Tote"
+           bounds = "20, 60, 100, 25" />
+                             
+    <TEXTFIELD name = "storageId"
+               bounds = "140, 60, 130, 25" />
+
+    <LABEL text = "MasterZone"
+           bounds = "20, 90, 100, 25" />
+                             
+    <COMBO name = "masterZoneId" 
+           bounds = "140, 90, 130, 25">
+      <comboitem value = "" />
+      <comboitem value = "Kit" />
+      <comboitem value = "ManualPick" />
+      <comboitem value = "Opex" />
+      <comboitem value = "Overflow_Areas" />
+      <comboitem value = "Pallet" />
+      <comboitem value = "PTL" />
+      <comboitem value = "Receiving" />
+      <comboitem value = "Replen" />
+      <comboitem value = "Reserve" />
+           
+    </COMBO>
+
+    <LABEL text = "Zone"
+           foreground = "red"
+           bounds = "300, 90, 40, 25" />
+
+    <TEXTFIELD name = "zoneId" 
+               bounds = "340, 90, 90, 25"/>
+    
+    <LABEL text = "Location"
+           bounds = "20, 120, 100, 25" />
+    
+    <LABEL text = "From"
+           foreground = "red"
+           bounds = "100, 120, 40, 25" />
+           
+    <TEXTFIELD name = "locationFrom"
+               bounds = "140, 120, 130, 25" />
+               
+    <LABEL text = "To"
+           foreground = "red"
+           bounds = "300, 120, 40, 25" />
+               
+    <TEXTFIELD name = "locationTo"
+               bounds = "340, 120, 130, 25" />    
+   
+    <LABEL text = "Discrepant"
+           bounds = "20, 150, 100, 25" />
+    
+     <!-- note: am using this check box to represent LOCATION_FLAGS DISCREPANT value.
+         If the check box is checked, the actioncommand arg 16 is added to the proc call,
+         if not check a null value is added. 
+         As this is a rather lame way of doing things, this may change in the future. -->
+    <BUTTON name = "chkInvDiscrepant" 
+            text = "Inventory"
+            type = "check" 
+            actionCommand = "Y"
+            bounds = "140, 150, 90, 25" />
+    
+    <BUTTON name = "chkLocDiscrepant" 
+            text = "Location"
+            type = "check" 
+            actionCommand = "Y"
+            bounds = "300, 150, 90, 25" />
+        
+
+    <LABEL text = "C/C Discrepant"
+           bounds = "20, 180, 100, 25" />
+
+    <TEXTFIELD name = "cycleCountOrder"
+               bounds = "140, 180, 130, 25" />
+
+    <LABEL text = "Date"
+           bounds = "20, 210, 100, 25" />
+           
+    <LABEL text = "From"
+           foreground = "red"
+           bounds = "100, 210, 40, 25" />
+           
+    <CALENDAR_COMBO name = "calFrom"
+                    date = "null"
+                    bounds = "140, 210, 130, 25"
+                    pastEnabled = "true" 
+					deselectEnabled = "true"/>
+               
+    <LABEL text = "To"
+           foreground = "red"
+           bounds = "300, 210, 40, 25" />    
+    
+    <CALENDAR_COMBO name = "calTo"
+                    date = "null"
+                    bounds = "340, 210, 130, 25"
+                    pastEnabled = "true"
+                    deselectEnabled = "true"/>
+
+    <LABEL text = "Quantity"
+           bounds = "20, 240, 100, 25" />
+
+    <LABEL text = "From"
+           foreground = "red"
+           bounds = "100, 240, 40, 25" />
+           
+    <NUMERICFIELD name = "qtyFrom" decimal = "false" negative = "false"
+               bounds = "140, 240, 130, 25" />
+               
+    <LABEL text = "To"
+           foreground = "red"
+           bounds = "300, 240, 40, 25" />
+               
+    <NUMERICFIELD name = "qtyTo"
+                  decimal = "false"
+                  negative = "false"
+                  bounds = "340, 240, 130, 25" />
+
+    <LABEL text = "Empty Storage"
+           bounds = "20, 270 100, 25" />
+      
+    <BUTTON name = "isEmptyStorage" 
+            text = ""
+            type = "check" 
+            actionCommand = "Y"
+            bounds = "140 270 90, 25" />
+              
+<!--   
+
+<LABEL text = "Inventory All?"
+           bounds = "20, 240, 100, 25" />
+
+    <BUTTON name = "invAllCheck" 
+            type = "check" 
+            bounds = "140, 240, 25, 25" />
+-->            
+  </COMPONENTS>
+
+</FRMCYCLECOUNTCREATE>

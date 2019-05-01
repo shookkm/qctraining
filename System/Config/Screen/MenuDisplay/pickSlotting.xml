@@ -1,0 +1,253 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     pickSlotting.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: pickSlotting.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Forward Pick Slotting" 
+            height = "400" 
+            width = "1050" 
+            frametype = "internal"
+            report = "true" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "locationStatesMap"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView 
+                            where mnemonicType = 'LOCATION_STATES' 
+                            order by idx" />
+
+    <VECTORMAP name = "locationStatusesMap"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView 
+                            where mnemonicType = 'LOCATION_STATUSES' 
+                            order by idx" />
+
+    <VECTORMAP name = "unitMasterUnitTypesDesc"
+               loadSql = "select UnitType,
+                                 Description
+                            from UnitTypes
+                           order by 2" />
+
+    <VECTOR name = "locationStates"
+            loadSql = "select returnCodeMsg
+                         from MnemonicCodesView 
+                        where mnemonicType = 'LOCATION_STATES' 
+                        order by idx" />
+
+    <VECTOR name = "locationStatuses"
+            loadSql = "select returnCodeMsg
+                         from MnemonicCodesView 
+                        where mnemonicType = 'LOCATION_STATUSES' 
+                        order by idx" />
+                                
+    <VECTORMAP name = "zoneList"
+               loadSql = "&#xA;select distinct lz.description, lz.zoneId
+                          &#xA;  from MasterZonesView mz
+                          &#xA;  join LocationZones lz
+                          &#xA;    on lz.zoneId = mz.subZoneId
+                          &#xA; where mz.masterZoneId in ('OPEX1', 'PICKING')" />
+
+    <VECTOR name = "addReplace">
+      <ITEM value = "Add" />
+      <ITEM value = "Replace" />
+    </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <TABPANE>
+    <TAB title="Slot View 01">
+      <SPLITPANE  divider = "200">
+        <FLEXSQLMODIFIERCOMPONENT name = "SlottingUpdateFilter01"
+                                  appendAsAnd = "false"
+                                  makeAbsolute = "true"
+                                  autoResize = "false"
+                                  autoExecute = "true"
+                                  labelsOnTop = "true"
+                                  maxFilterRows = "5"
+                                  editorWidth = "150"
+                                  showCheckBoxes = "false"
+                                  filterBorderText = "Filter Criteria"
+                                  filterBorderColor = "blue"
+                                  okButtonText = "Execute"
+                                  passiveMode = "false"
+                                  orientation = "vertical">
+          <FILTER_OPTION label = "ZoneId" 
+                         altValue = "zoneId01" 
+                         editorType = "combo" 
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "zoneList" loadEmptyItem = "true"/>      
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "LocationId" 
+                         altValue = "locationId01" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Unit"
+                         altValue = "unit01"
+                         editorType = "text"
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Show Only Holes" 
+                         altValue = "holes01" 
+                         editorType = "combo" 
+                         autoQuote = "true" >
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "" />
+              <COMBO_OPTION value = "False" />
+              <COMBO_OPTION value = "True" />
+            </COMBO_OPTIONS>
+          </FILTER_OPTION>
+
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "SlottingTable01" 
+                            init = "init" 
+                            refresh = "true" 
+                            refreshOnUpdate = "true"
+                            refreshOnInsert = "true"
+                            greenbar = "true"
+                            records = "2000"
+                            ignoreEventConcatenation = "true">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "SlottingUpdateFilter01" />
+
+          <TABLE key = "SlottingUpdateFilter01:execute" >
+            <SELECT sql = "call LocationSlottingEx(//zoneId01,
+                                                   //locationId01, 
+                                                   //unit01,
+                                                   //holes01)"/>
+
+            <UPDATE sql = "call LocationSlottingInsertEx(/*LocationId,
+                                                         /*Unit,
+                                                         //Unit,
+                                                         null,
+                                                         //MaxQty,
+                                                         //MinQty,
+                                                         //State,
+                                                         //Status,
+                                                         '$QC_USER',
+                                                         'EACH',
+                                                         'EACH',
+                                                         //Add/Replace)"/>
+
+            <DELETE sql = "call LocationSlottingInsertEx(/*LocationId,
+                                                         /*Unit,
+                                                         null,
+                                                         null,
+                                                         0,
+                                                         0,
+                                                         /*State,
+                                                         /*Status,
+                                                         '$QC_USER',
+                                                         null,
+                                                         'EACH',
+                                                         null)" />
+
+            <ALTVALUES>
+              <FIELD name = "Status"
+                     ifdef = "locationStatusesMap"/>
+              <FIELD name = "State"
+                     ifdef = "locationStatesMap"/>
+              <FIELD name = "UnitType"
+                     ifdef = "unitMasterUnitTypesDesc"/>
+            </ALTVALUES>
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Qty"   
+                           align = "right"/>
+              <TABLECOLUMN name = "MaxQty"  
+                           align = "right" />
+              <TABLECOLUMN name = "MinQty"  
+                           align = "right" />
+              <TABLECOLUMN name = "Priority"  
+                           align = "right" />
+            </TABLECOLUMNS>
+
+            <EDITOR restoreHide = "true">
+              <FIELD name = "Location">
+                 <TEXTFIELD cutpaste = "true"/>
+              </FIELD>
+
+              <FIELD name = "Unit">
+                <NOTIFICATIONTEXTFIELD name = "skuText1" cutpaste = "true"
+                                       minEventChars = "1"/>
+              </FIELD>
+
+              <FIELD name = "MaxQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "MinQty">
+                <NUMERICFIELD  decimal = "false" 
+                               negative = "false" />
+              </FIELD>
+
+              <FIELD name = "Status">
+                <COMBO editable = "false" 
+                       ifdef = "locationStatuses" />
+              </FIELD>
+
+              <FIELD name = "State">
+                <COMBO editable = "false" 
+                       ifdef = "locationStates" />
+              </FIELD>
+
+              <FIELD name = "Add/Replace">
+                <COMBO editable = "false" ifdef = "addReplace" />
+              </FIELD>
+            </EDITOR>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </SPLITPANE>
+    </TAB>
+
+    <TAB title="Summary">
+      <FLEXTABLECOMPONENT name = "SKU" 
+                          init = "init" 
+                          refresh = "true" 
+                          refreshOnUpdate = "true"
+                          refreshOnInsert = "true"
+                          greenbar = "true"
+                          records = "2000"
+                          ignoreEventConcatenation = "true">
+        <DBCONNECT type = "global" />
+
+        <TABLE key = "init" >
+          <SELECT sql = "select um.Unit, um.Description, lz.MasterZoneId, lz.ZoneId, l.LocationId, asu.MinQty, asu.MaxQty
+                           from UnitMasters um
+                           left outer join AcceptableStorageUnits asu
+                             on asu.unit = um.unit
+                            and asu.unitType = um.unitType
+                           left outer join Locations l
+                           left outer join LocationZones lz
+                          where um.unitType = 'each'
+                            and um.unit != 'nullsku'
+                          order by um.Unit, l.ZoneId, l.LocationId"/>
+
+          <TABLECOLUMNS>
+            <TABLECOLUMN name = "MaxQty"  
+                         align = "right" />
+            <TABLECOLUMN name = "MinQty"  
+                         align = "right" />
+          </TABLECOLUMNS>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

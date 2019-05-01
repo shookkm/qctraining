@@ -1,0 +1,123 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     files.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: files.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<systemScreenFiles>
+  <Screen commandId = "sysParams" 
+          helpId = "oiSystemParameters" 
+          count = "1"
+          screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/systemParameters.xml" />
+      <param name = "xmlSource" 
+             value = "project" />
+    </Params>
+  </Screen>
+  
+  <Screen commandId = "securityAdmin" 
+          count = "1"
+          screenClass = "Gui.Security.FrmGroupSecurityAdministration">
+    <Params>
+      <param name = "connectionId" 
+             value = "default" />
+      <param name = "title" 
+             value = "Security Administration" />
+    </Params>
+  </Screen>     
+
+  <Screen commandId = "operators" 
+          count = "1"
+          screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/operators.xml" />
+      <param name = "xmlSource"
+             value = "project" />
+    </Params>
+  </Screen>
+
+  <Screen commandId = "processes" 
+          count = "1"
+          screenClass = "Gui.SystemProcesses.FrmProcesses"/>
+
+  <Screen commandId = "FTP" 
+          count = "1"
+          screenClass = "Gui.FtpFileListing.FrmFtpFileListing">
+  </Screen>
+  
+
+  <Screen commandId = "sorterConfig" 
+          count = "1"
+          screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/sorterConfig.xml" />
+      <param name = "xmlSource" 
+             value = "project" />
+    </Params>
+  </Screen>
+
+  <Screen commandId = "routeMaint" 
+          count = "1"
+          screenClass = "Gui.RouteMaintenance.FrmRouteMaintenance">
+    <Params>
+      <param name = "connectionId" 
+             value = "default" />
+      <param name = "relayCommands" 
+             value = "refresh:sortDestinations" />
+    </Params>
+  </Screen>
+
+  <Screen commandId = "sortDestinations" 
+          count = "1"
+          screenClass = "Gui.SortDestinations.FrmSortDestinations">
+    <Params>
+      <param name = "connectionId" 
+             value = "default" />
+      <param name = "relayCommands" 
+             value = "refresh:routeMaint" />
+      <param name = "size" 
+             value = "700, 500" />
+    </Params>
+  </Screen>
+
+  <Screen commandId = "scales" count = "1"
+          screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/scales.xml" />
+      <param name = "xmlSource" 
+             value = "project" />
+    </Params>
+  </Screen>
+
+  <Screen commandId = "inkjetMaint" count = "1"
+           screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/inkjetMaintenance.xml" />
+      <param name = "xmlSource" 
+             value = "project" />
+    </Params>
+  </Screen>     
+
+  <Screen commandId = "printers" count = "1"
+           screenClass = "Gui.FlexScreen.FleXmlScreen">
+    <Params>
+      <param name = "xmlFileName" 
+             value = "MenuSystem/printers.xml" />
+      <param name = "xmlSource" 
+             value = "project" />
+    </Params>
+  </Screen> 
+</systemScreenFiles>

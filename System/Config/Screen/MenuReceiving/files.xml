@@ -1,0 +1,46 @@
+<!--
+ - Filename:     files.xml
+ - Description:
+ -
+ - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+ - No part of this copyrighted work may be reproduced, modified, or
+ - distributed in any form or by any means without the prior written
+ - permission of Queen City Software, Inc.
+ -
+ - $Id: files.xml 9911 2018-03-15 14:20:24Z rlh $
+ - Notes:
+-->
+<receivingMenuFiles>
+      <Screen commandId = "asn"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReceiving/asnWorkOrders.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "truckSchedule"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReceiving/truckSchedule.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "openPOs"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReceiving/openPoLinesReport.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+</receivingMenuFiles>

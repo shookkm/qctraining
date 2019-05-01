@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     statisticsMgr.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: statisticsMgr.xml 9566 2017-09-06 17:08:37Z wlw $
+   - Notes:
+  -->
+<!--
+     The delay attribute controls the delay in processing of sorter assigned
+     and sorted messages.  This may be useful if the race condition is occuring
+     for writing the container log entry when a scan is received and when the
+     sorter assigned/sorted messages arrive.  This delay is in milliseconds.
+     The default is 0.
+  -->
+<StatisticsMgr delay = "0">
+  <!--
+       Define the database connections to be used.  Environmental variables
+       can be used in the values which will then be looked up.
+
+       Database connections are optional.
+    -->
+  <DbConnect id = "wcs" machine = "$DATABASE_MACHINE"
+             user = "statisticsMgr" password = "statisticsMgr"
+             database = "$DATABASE_NAME"
+             port = "$DATABASE_PORT"
+             adapter = "Library.Database.IAnywhereDatabaseAdapter"
+             trackStatements = "true"/>
+
+  <!--
+       Define the default database pool because the communications use it to
+       access the database.
+    -->
+  <DbPool dbId = "wcs" minSize = "2"/>
+
+  <!--
+       Need to have the MaintainStatistics task defined so statistics are
+       written to the database.
+    -->
+  <TaskThread name = "maintain" interval = "1000" dbId = "wcs">
+    <QcTask task = "Products.StatisticsMgr.MaintainStatistics"/>
+  </TaskThread>
+
+  <TaskThread name = "checkIdleUsers"
+              dbId = "wcs">
+    <Schedule day = "DAILY" hour = "0" minute = "30" second = "0"/>
+
+    <QcTask task = "Products.QcApp.Tasks.DisconnectIdleASAUsers"
+            userId = "qcScreens"
+            idleTimeout = "24"/>
+  </TaskThread>
+</StatisticsMgr>

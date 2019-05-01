@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     navigatorMenuItems.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: navigatorMenuItems.xml 10276 2018-06-25 15:38:09Z tds $
+   - Notes:
+  -->
+<navigatorMenuItems>
+        <separator />
+
+        <menuitem commandId = "sorterConfig" 
+                  text = "Sorter Configuration"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "routeMaint" 
+                  text = "Route Maintenance"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "sortDestinations" 
+                  text = "Sort Destinations"
+                  handler = "defaultScreen" />
+        <separator />
+        <menuitem commandId = "scales" 
+                  text = "Scale Maintenance"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "inkjetMaint" 
+                  text = "Ink Jet Maintenance"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "flowControl"
+                  text = "Flow Control"
+                  handler = "defaultScreen" />
+</navigatorMenuItems>

@@ -1,0 +1,1036 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     sorterConfig.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: sorterConfig.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Sorter Configuration"
+            height = "400" 
+            width = "1000" 
+            frametype = "internal"
+            updateSecurity = "sorterConfig.edit" 
+            insertSecurity = "sorterConfig.insert"
+            deleteSecurity = "sorterConfig.delete">
+
+  <DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "areaMap"
+               loadSql = "select areaId,
+                                 description
+                            from sorterAreas
+                           order by displayOrder"/>
+
+    <VECTOR name = "areas"
+            loadSql = "select description
+                         from sorterAreas
+                        order by displayOrder"/>
+
+    <VECTORMAP name = "distribZoneMap"
+               loadSql = "select zone,
+                                 description
+                            from sorterDistribZones
+                           order by description"/>
+
+    <VECTOR name = "distribZones"
+            loadSql = "select description
+                         from sorterDistribZones
+                        order by description"/>
+
+    <VECTOR name = "sortedMnemonics"
+            loadSql = "select mnemonicCode
+                         from mnemonicCodesView
+                        where mnemonicType = 'SORTER_MGR_STATUSES'
+                          and idx >= 0
+                        order by idx"/>
+
+    <VECTOR name = "displayMnemonics"
+            loadSql = "select mnemonicCode
+                         from mnemonicCodesView
+                        where mnemonicType = 'CONTAINER_LOG_STATUSES'
+                          and idx >= 0
+                        order by idx"/>
+
+    <VECTORMAP name = "yesNoMap">
+      <ITEM key = "0" value = "No"/>
+      <ITEM key = "1" value = "Yes"/>
+    </VECTORMAP>
+
+    <VECTOR name = "yesNo">
+      <ITEM value = "No"/>
+      <ITEM value = "Yes"/>
+    </VECTOR>
+
+    <!--
+         the columns are reversed in these maps because they are used by a
+         popup bit value editor
+      -->
+    <VECTORMAP name    = "sorterIdFlags"
+               loadSql = "SELECT returnCodeMsg, idx
+                            FROM MnemonicCodesView
+                           WHERE mnemonicType = 'SORTER_ID_FLAGS'
+                           ORDER BY idx"/>
+
+    <VECTORMAP name    = "sorterLaneFlags"
+               loadSql = "SELECT returnCodeMsg, idx
+                            FROM MnemonicCodesView
+                           WHERE mnemonicType = 'SORTER_LANE_FLAGS'
+                           ORDER BY idx"/>
+
+    <VECTORMAP name    = "sorterLaneStatusFlags"
+               loadSql = "SELECT returnCodeMsg, idx
+                            FROM MnemonicCodesView
+                           WHERE mnemonicType = 'SORTER_LANE_STATUS_FLAGS'
+                           ORDER BY idx"/>
+  </GLOBAL_DEFINITIONS>
+
+  <TABPANE>
+    <TAB  title = "Sorter Areas">
+      <FLEXTABLECOMPONENT name = "areas" init = "areaTable"
+                          greenbar = "true" refresh = "true"
+                          refreshOnUpdate = "true" refreshOnInsert = "true">
+        <DBCONNECT type = "global"/>
+
+        <TABLE key = "areaTable">
+          <SELECT sql = "select AreaId,
+                                Description,
+                                RecircMax,
+                                NoReadMax,
+                                NoRecordMax,
+                                DisplayOrder,
+                                Ts
+                           from sorterAreas
+                          order by displayOrder, areaId"/>
+
+          <UPDATE sql = "update sorterAreas
+                            set areaId = //AreaId,
+                                description = //Description,
+                                recircMax = //RecircMax,
+                                noReadMax = //NoReadMax,
+                                noRecordMax = //NoRecordMax,
+                                displayOrder = //DisplayOrder
+                          where areaId = //AreaId"/>
+
+          <DELETE sql = "delete from sorterAreas
+                          where areaId = //AreaId"/>
+
+          <INSERT sql = "insert into sorterAreas(areaId,
+                                                 description,
+                                                 recircMax,
+                                                 noReadMax,
+                                                 noRecordMax,
+                                                 displayOrder)
+                                          values(//AreaId,
+                                                 //Description,
+                                                 //RecircMax,
+                                                 //NoReadMax,
+                                                 //NoRecordMax,
+                                                 //DisplayOrder)"/>
+
+          <EDITOR restoreHide = "true" title = "Sorter Area"
+                  saveText = "Save" cancelText = "Cancel">
+            <FIELD name = "AreaId" required = "true">
+              <TEXTFIELD cutpaste = "true"/>
+            </FIELD>
+            <FIELD name = "Description" required = "true">
+              <TEXTFIELD cutpaste = "true"/>
+            </FIELD>
+            <FIELD name = "RecircMax">
+              <NUMERICFIELD/>
+            </FIELD>
+            <FIELD name = "NoReadMax">
+              <NUMERICFIELD/>
+            </FIELD>
+            <FIELD name = "NoRecordMax">
+              <NUMERICFIELD/>
+            </FIELD>
+            <FIELD name = "DisplayOrder">
+              <NUMERICFIELD/>
+            </FIELD>
+          </EDITOR>
+        </TABLE>
+
+        <InsertInterpreter>
+          <Field name = "RecircMax"
+                 searchField = "" 
+                 defaultValue = "0"
+                 searchTable = "false" 
+                 searchParent = "false"/>
+          <Field name = "NoReadMax"
+                 searchField = "" 
+                 defaultValue = "0"
+                 searchTable = "false" 
+                 searchParent = "false"/>
+          <Field name = "NoRecordMax"
+                 searchField = "" 
+                 defaultValue = "0"
+                 searchTable = "false" 
+                 searchParent = "false"/>
+          <Field name = "DisplayOrder"
+                 searchField = "" 
+                 defaultValue = "0"
+                 searchTable = "false" 
+                 searchParent = "false"/>
+        </InsertInterpreter>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+
+    <TAB  title = "Route Distribution Zones">
+      <FLEXTABLECOMPONENT name = "zones" init = "zoneTable"
+                          greenbar = "true" refresh = "true"
+                          refreshOnUpdate = "true" refreshOnInsert = "true">
+        <DBCONNECT type = "global"/>
+
+        <TABLE key = "zoneTable">
+          <SELECT sql = "select Zone,
+                                Description,
+                                Ts
+                           from sorterDistribZones
+                          order by zone"/>
+
+          <UPDATE sql = "update sorterDistribZones
+                            set zone = //Zone,
+                                description = //Description
+                          where zone = //ZoneId"/>
+
+          <DELETE sql = "delete from sorterDistribZones
+                          where zone = //Zone"/>
+
+          <INSERT sql = "insert into sorterDistribZones(zone,
+                                                        description)
+                                                 values(//Zone,
+                                                        //Description)"/>
+
+          <EDITOR restoreHide = "true" title = "Route Distribution Zone"
+                  saveText = "Save" cancelText = "Cancel">
+            <FIELD name = "Zone" required = "true">
+              <NUMERICFIELD/>
+            </FIELD>
+            <FIELD name = "Description" required = "true">
+              <TEXTFIELD cutpaste = "true"/>
+            </FIELD>
+          </EDITOR>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+
+    <TAB  title = "Sorters">
+      <SPLITPANE  divider = "150">
+        <FLEXTREECOMPONENT name = "SorterTree"
+                           init = "sorterTree"
+                           refresh = "true"
+                           records = "25">
+
+          <DBCONNECT type = "global"/>
+
+          <TREE name = "sorterTree" root = "Sorter Areas">
+            <!-- optional icons for each tree level  -->
+            <TREEICON level = "0" iconType = "standard" icon = "sorter4.gif" micon="sorter4"/>
+            <TREEICON level = "1" iconType = "standard" icon = "sorter3.gif" micon="sorter3"/>
+            <TREEICON level = "2" iconType = "standard" icon = "sorterBlue.gif" micon="split"/>
+
+            <SELECT level = "0" sql = "select description, areaId
+                                         from sorterAreas"/>
+            <SELECT level = "1" sql = "select description, sorterId
+                                         from sorterIds
+                                        where areaId = //sorterTree.1
+                                        order by displayRoutes, sorterId"/>
+
+            <DEFAULT_TREE_MODIFIER sql = " order by displayOrder"/>
+          </TREE>
+        </FLEXTREECOMPONENT>
+
+        <TABPANE tabplacement = "bottom">
+          <TAB title = "Sorters">
+            <FLEXTABLECOMPONENT name = "sorters" init = "sorterTable"
+                                greenbar = "true" refresh = "true"
+                                refreshOnUpdate = "true" refreshOnInsert = "true">
+              <DBCONNECT type = "global"/>
+              <TRIGGER name = "SorterTree"/>
+
+              <TABLE key = "sorterTree.0">
+                <SELECT sql = "select si.AreaId Area,
+                                      si.SorterId,
+                                      si.Description,
+                                      stp.PlcNo,
+                                      stp.PlcInductAddress,
+                                      stp.PlcDivertAddress,
+                                      si.DisplayRoutes,
+                                      si.RatesEnabled,
+                                      si.Zone,
+                                      si.RecircMax,
+                                      si.NoReadMax,
+                                      si.NoRecordMax,
+                                      si.Flags,
+                                      si.Ts
+                                 from SorterAreas sa
+                                 join SorterIds si
+                                 join ScannerToPlc stp
+                                   on stp.scannerId = si.description
+                                order by sa.displayOrder, si.displayRoutes,
+                                         si.sorterId"/>
+
+                <UPDATE sql = "call SorterConfigUpdateSorterEx(/*SorterId,
+                                                               //SorterId,
+                                                               //Description,
+                                                               //Area,
+                                                               /*Zone,
+                                                               //Zone,
+                                                               //DisplayRoutes,
+                                                               //RatesEnabled,
+                                                               //RecircMax,
+                                                               //NoReadMax,
+                                                               //NoRecordMax,
+                                                               /*Flags,
+                                                               //Flags,
+                                                               //PlcNo,
+                                                               //PlcInductAddress,
+                                                               //PlcDivertAddress)"/>
+
+                <DELETE sql = "call SorterConfigDeleteSorterEx(/*Description)"/>
+
+                <INSERT sql = "call SorterConfigAddSorterEx(//SorterId,
+                                                            //Description,
+                                                            //Area,
+                                                            //Zone,
+                                                            //DisplayRoutes,
+                                                            //RatesEnabled,
+                                                            //RecircMax,
+                                                            //NoReadMax,
+                                                            //NoRecordMax,
+                                                            //Flags,
+                                                            //PlcNo,
+                                                            //PlcInductAddress,
+                                                            //PlcDivertAddress)"/>
+
+                <ALTVALUES>
+                  <FIELD name = "RatesEnabled" ifdef = "yesNoMap"/>
+                  <FIELD name = "Area" ifdef = "areaMap"/>
+                  <FIELD name = "Zone" ifdef = "distribZoneMap"/>
+                </ALTVALUES>
+
+                <EDITOR restoreHide = "true" title = "Sorter"
+                        saveText = "Save" cancelText = "Cancel">
+                  <FIELD name = "SorterId" required = "true">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Description" required = "true">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "Area" required = "true">
+                    <COMBO ifdef = "areas"/>
+                  </FIELD>
+                  <FIELD name = "PlcNo">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "PlcInductAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "PlcDivertAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "DisplayRoutes">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "RatesEnabled">
+                    <COMBO ifdef = "yesNo"/>
+                  </FIELD>
+                  <FIELD name = "Zone">
+                    <COMBO loadEmptyItem = "true" ifdef = "distribZones"/>
+                  </FIELD>
+                  <FIELD name = "RecircMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoReadMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoRecordMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Flags">
+                    <POPUPBITVALUEEDITOR>
+                      <BIT_VALUES ifdef = "sorterIdFlags"/>
+                    </POPUPBITVALUEEDITOR>
+                  </FIELD>
+                </EDITOR>
+              </TABLE>
+
+              <TABLE key = "sorterTree.1">
+                <SELECT sql = "select si.SorterId,
+                                      si.Description,
+                                      stp.PlcNo,
+                                      stp.PlcInductAddress,
+                                      stp.PlcDivertAddress,
+                                      si.DisplayRoutes,
+                                      si.RatesEnabled,
+                                      si.Zone,
+                                      si.RecircMax,
+                                      si.NoReadMax,
+                                      si.NoRecordMax,
+                                      si.Flags,
+                                      si.Ts
+                                 from SorterIds si
+                                 join ScannerToPlc stp
+                                   on stp.scannerId = si.description
+                                where si.areaId = //sorterTree.1
+                                order by si.displayRoutes, si.sorterId"/>
+
+                <UPDATE sql = "call SorterConfigUpdateSorterEx(/*SorterId,
+                                                               //SorterId,
+                                                               //Description,
+                                                               //sorterTree.1,
+                                                               /*Zone,
+                                                               //Zone,
+                                                               //DisplayRoutes,
+                                                               //RatesEnabled,
+                                                               //RecircMax,
+                                                               //NoReadMax,
+                                                               //NoRecordMax,
+                                                               /*Flags,
+                                                               //Flags,
+                                                               //PlcNo,
+                                                               //PlcInductAddress,
+                                                               //PlcDivertAddress)"/>
+
+                <DELETE sql = "call SorterConfigDeleteSorterEx(/*Description)"/>
+
+                <INSERT sql = "call SorterConfigAddSorterEx(//SorterId,
+                                                            //Description,
+                                                            //sorterTree.1,
+                                                            //Zone,
+                                                            //DisplayRoutes,
+                                                            //RatesEnabled,
+                                                            //RecircMax,
+                                                            //NoReadMax,
+                                                            //NoRecordMax,
+                                                            //Flags,
+                                                            //PlcNo,
+                                                            //PlcInductAddress,
+                                                            //PlcDivertAddress)"/>
+
+                <ALTVALUES>
+                  <FIELD name = "RatesEnabled" ifdef = "yesNoMap"/>
+                  <FIELD name = "Zone" ifdef = "distribZoneMap"/>
+                </ALTVALUES>
+
+                <EDITOR restoreHide = "true" title = "Sorter"
+                        saveText = "Save" cancelText = "Cancel">
+                  <FIELD name = "SorterId" required = "true">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Description" required = "true">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "PlcNo">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "PlcInductAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "PlcDivertAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "DisplayRoutes">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "RatesEnabled">
+                    <COMBO ifdef = "yesNo"/>
+                  </FIELD>
+                  <FIELD name = "Zone">
+                    <COMBO loadEmptyItem = "true" ifdef = "distribZones"/>
+                  </FIELD>
+                  <FIELD name = "RecircMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoReadMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoRecordMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Flags">
+                    <POPUPBITVALUEEDITOR>
+                      <BIT_VALUES ifdef = "sorterIdFlags"/>
+                    </POPUPBITVALUEEDITOR>
+                  </FIELD>
+                </EDITOR>
+              </TABLE>
+
+              <TABLE key = "sorterTree.2">
+                <SELECT sql = "select si.Description,
+                                      stp.PlcNo,
+                                      stp.PlcInductAddress,
+                                      stp.PlcDivertAddress,
+                                      si.DisplayRoutes,
+                                      si.RatesEnabled,
+                                      si.Zone,
+                                      si.RecircMax,
+                                      si.NoReadMax,
+                                      si.NoRecordMax,
+                                      si.Flags,
+                                      si.Ts
+                                 from SorterIds si
+                                 join ScannerToPlc stp
+                                   on stp.scannerId = si.description
+                                where si.sorterId = //sorterTree.2"/>
+
+                <UPDATE sql = "call SorterConfigUpdateSorterEx(//sorterTree.2,
+                                                               //sorterTree.2,
+                                                               //Description,
+                                                               //sorterTree.1,
+                                                               /*Zone,
+                                                               //Zone,
+                                                               //DisplayRoutes,
+                                                               //RatesEnabled,
+                                                               //RecircMax,
+                                                               //NoReadMax,
+                                                               //NoRecordMax,
+                                                               /*Flags,
+                                                               //Flags,
+                                                               //PlcNo,
+                                                               //PlcInductAddress,
+                                                               //PlcDivertAddress)"/>
+
+                <DELETE sql = "call SorterConfigDeleteSorterEx(/*Description)"/>
+
+                <ALTVALUES>
+                  <FIELD name = "RatesEnabled" ifdef = "yesNoMap"/>
+                  <FIELD name = "Zone" ifdef = "distribZoneMap"/>
+                </ALTVALUES>
+
+                <EDITOR restoreHide = "true" title = "Sorter"
+                        saveText = "Save" cancelText = "Cancel">
+                  <FIELD name = "Description" required = "true">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "PlcNo">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "PlcInductAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "PlcDivertAddress">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "DisplayRoutes">
+                    <TEXTFIELD cutpaste = "true"/>
+                  </FIELD>
+                  <FIELD name = "RatesEnabled">
+                    <COMBO ifdef = "yesNo"/>
+                  </FIELD>
+                  <FIELD name = "Zone">
+                    <COMBO loadEmptyItem = "true" ifdef = "distribZones"/>
+                  </FIELD>
+                  <FIELD name = "RecircMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoReadMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "NoRecordMax">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Flags">
+                    <POPUPBITVALUEEDITOR>
+                      <BIT_VALUES ifdef = "sorterIdFlags"/>
+                    </POPUPBITVALUEEDITOR>
+                  </FIELD>
+                </EDITOR>
+              </TABLE>
+
+              <InsertInterpreter>
+                <Field name = "DisplayRoutes"
+                       searchField = ""
+                       defaultValue = "0"
+                       searchTable = "false"
+                       searchParent = "false"/>
+                <Field name = "RatesEnabled"
+                       searchField = ""
+                       defaultValue = "1"
+                       searchTable = "false"
+                       searchParent = "false"/>
+                <Field name = "Flags"
+                       searchField = ""
+                       defaultValue = "0"
+                       searchTable = "false"
+                       searchParent = "false"/>
+              </InsertInterpreter>
+            </FLEXTABLECOMPONENT>
+          </TAB>
+
+          <TAB title = "Lanes">
+            <SPLITPANE divider = "200" orientation = "vertical">
+              <FLEXTABLECOMPONENT name = "sorterLanes"
+                                  greenbar = "true"
+                                  refresh = "true"
+                                  refreshOnUpdate = "true"
+                                  refreshOnInsert = "true">
+                <DBCONNECT type = "global"/>
+                <TRIGGER name = "SorterTree"/>
+
+                <TABLE key = "sorterTree.0">
+                  <SELECT sql = "Select si.AreaId Area,
+                                        si.Description Sorter,
+                                        sl.LaneNo,
+                                        sl.LaneName,
+                                        sl.LaneId,
+                                        SorterLanesRateToInt(sl.caseRate) CaseRate,
+                                        sl.Priority,
+                                        sl.ComplexPriority,
+                                        sl.PlcAckAddress,
+                                        sl.DisplayOrder,
+                                        sl.Flags,
+                                        sl.Ts
+                                   from sorterAreas sa
+                                   join sorterIds si
+                                   join sorterLanes sl
+                                  order by sa.displayOrder, si.displayRoutes,
+                                           si.sorterId, sl.displayOrder"/>
+
+                  <ALTVALUES>
+                    <FIELD name = "Area" ifdef = "areaMap"/>
+                  </ALTVALUES>
+                </TABLE>
+
+                <TABLE key = "sorterTree.1">
+                  <SELECT sql = "Select si.Description Sorter,
+                                        sl.LaneNo,
+                                        sl.LaneName,
+                                        sl.LaneId,
+                                        SorterLanesRateToInt(sl.caseRate) CaseRate,
+                                        sl.Priority,
+                                        sl.ComplexPriority,
+                                        sl.PlcAckAddress,
+                                        sl.DisplayOrder,
+                                        sl.Flags,
+                                        sl.Ts
+                                   from sorterLanes sl
+                                   join sorterIds si
+                                  where si.areaId = //sorterTree.1
+                                  order by si.displayRoutes, si.sorterId, sl.displayOrder"/>
+                </TABLE>
+
+                <TABLE key = "sorterTree.2">
+                  <SELECT sql = "select LaneNo,
+                                        LaneName,
+                                        LaneId,
+                                        SorterLanesRateToInt(caseRate) CaseRate,
+                                        Priority,
+                                        ComplexPriority,
+                                        PlcAckAddress,
+                                        DisplayOrder,
+                                        Flags,
+                                        Ts
+                                   from sorterLanes   
+                                  where sorterId = //sorterTree.2
+                                  order by displayOrder"/>
+
+                  <INSERT sql = "call SorterConfigAddLaneEx(//sorterTree.2,
+                                                            //LaneNo, 
+                                                            //LaneName,
+                                                            //LaneId,
+                                                            //CaseRate,
+                                                            //Priority,
+                                                            //DisplayOrder,
+                                                            //Flags,
+                                                            //ComplexPriority,
+                                                            //PlcAckAddress)"/>;
+
+                  <UPDATE sql = "update sorterLanes
+                                    set laneName = //LaneName,
+                                        laneId = //LaneId,
+                                        caseRate = SorterLanesRateFromInt(//CaseRate),
+                                        priority = //Priority,
+                                        displayOrder = //DisplayOrder,
+                                        flags = //Flags,
+                                        complexPriority = //ComplexPriority,
+                                        plcAckAddress = //PlcAckAddress
+                                  where sorterId = //sorterTree.2
+                                    and laneNo = //LaneNo"/>
+
+                  <DELETE sql = "delete from sorterLanes
+                                  where sorterId = //sorterTree.2
+                                    and laneNo = //LaneNo"/>
+
+                  <EDITOR restoreHide = "true" title = "Lane"
+                          saveText = "Save" cancelText = "Cancel">
+                    <FIELD name = "LaneNo" required = "true">
+                      <NUMERICFIELD/>
+                    </FIELD>
+                    <FIELD name = "LaneName" required = "true">
+                      <TEXTFIELD cutpaste = "true"/>
+                    </FIELD>
+                    <FIELD name = "LaneId">
+                      <TEXTFIELD cutpaste = "true"/>
+                    </FIELD>
+                    <FIELD name = "CaseRate" required = "true"> 
+                      <NUMERICFIELD/>
+                    </FIELD>
+                    <FIELD name = "Priority" required = "true"> 
+                      <NUMERICFIELD/>
+                    </FIELD>
+                    <FIELD name = "ComplexPriority">
+                      <NUMERICFIELD/>
+                    </FIELD>
+                    <FIELD name = "PlcAckAddress">
+                      <TEXTFIELD cutpaste = "true"/>
+                    </FIELD>
+                    <FIELD name = "DisplayOrder">
+                      <NUMERICFIELD/>
+                    </FIELD>
+                    <FIELD name = "Flags">
+                      <POPUPBITVALUEEDITOR>
+                        <BIT_VALUES ifdef = "sorterLaneFlags"/>
+                      </POPUPBITVALUEEDITOR>
+                    </FIELD>
+                  </EDITOR>
+                </TABLE>
+
+                <InsertInterpreter>
+                  <Field name = "CaseRate"
+                         searchField = ""
+                         defaultValue = "30"
+                         searchTable = "false"
+                         searchParent = "false"/>
+                  <Field name = "ComplexPriority"
+                         searchField = ""
+                         defaultValue = "0"
+                         searchTable = "false"
+                         searchParent = "false"/>
+                  <Field name = "Flags"
+                         searchField = ""
+                         defaultValue = "0"
+                         searchTable = "false"
+                         searchParent = "false"/>
+                  <Field name = "Priority"
+                         searchField = ""
+                         defaultValue = "1"
+                         searchTable = "false"
+                         searchParent = "false"/>
+                </InsertInterpreter>
+              </FLEXTABLECOMPONENT>
+
+              <FLEXTABLECOMPONENT name = "sorterLanesStatuses" 
+                                  greenbar = "true"  
+                                  refresh = "true"
+                                  refreshOnUpdate = "true"
+                                  refreshOnInsert = "true">
+                <DBCONNECT type = "global"/>
+                <TRIGGER name = "sorterLanes"/>
+
+                <TABLE key = "sorterLanes:sorterTree.0"
+                       title="Lane Statuses">
+                  <SELECT sql = "select 'First select a sorter in the tree.'"/>
+                </TABLE>
+
+                <TABLE key = "sorterLanes:sorterTree.1"
+                       title="Lane Statuses">
+                  <SELECT sql = "select 'First select a sorter in the tree.'"/>
+                </TABLE>
+
+                <TABLE key = "sorterLanes:sorterTree.2"
+                       title="Lane Statuses">
+                  <SELECT sql = "select SortedMnemonicCode,
+                                        DisplayMnemonicCode, Flags
+                                   from sorterLaneStatuses
+                                  where sorterId = //sorterTree.2
+                                    and laneNo = //LaneNo"/>
+
+                  <UPDATE sql = "update sorterLaneStatuses
+                                    set sortedMnemonicCode = //SortedMnemonicCode,
+                                        displayMnemonicCode = //DisplayMnemonicCode,
+                                        flags = //Flags
+                                  where sorterId = //sorterTree.2
+                                    and laneNo = //LaneNo
+                                    and sortedMnemonicCode = //SortedMnemonicCode"/>
+
+                  <DELETE sql = "delete sorterLaneStatuses
+                                  where sorterId = //sorterTree.2
+                                    and laneNo = //LaneNo
+                                    and sortedMnemonicCode = //SortedMnemonicCode"/>
+
+                  <INSERT sql = "insert into sorterLaneStatuses(sorterId,
+                                                                laneNo,
+                                                                sortedMnemonicCode,
+                                                                displayMnemonicCode,
+                                                                flags)
+                                                         values(//sorterTree.2
+                                                                //LaneNo,
+                                                                //SortedMnemonicCode,
+                                                                //DisplayMnemonicCode,
+                                                                //Flags)"/>
+
+                  <EDITOR restoreHide = "true" title = "Lane Status"
+                          saveText = "Save" cancelText = "Cancel">
+                    <FIELD name = "SortedMnemonicCode" required = "true">
+                      <COMBO ifdef = "sortedMnemonics"/>
+                    </FIELD>
+                    <FIELD name = "DisplayMnemonicCode" required = "true">
+                      <COMBO ifdef = "displayMnemonics"/>
+                    </FIELD>
+                    <FIELD name = "Flags">
+                      <POPUPBITVALUEEDITOR>
+                        <BIT_VALUES ifdef = "sorterLaneStatusFlags"/>
+                      </POPUPBITVALUEEDITOR>
+                    </FIELD>
+                  </EDITOR>
+                </TABLE>             
+
+                <InsertInterpreter>
+                  <Field name = "Flags"
+                         searchField = ""
+                         defaultValue = "0"
+                         searchTable = "false"
+                         searchParent = "false"/>
+                </InsertInterpreter>
+              </FLEXTABLECOMPONENT>
+            </SPLITPANE>
+          </TAB>  <!-- end Lanes -->
+        </TABPANE>  <!-- end Sorter/Lanes tabs -->
+      </SPLITPANE>  <!-- end Area tree split -->
+    </TAB>
+
+    <TAB  title = "Overview">
+      <SPLITPANE  divider = "150">
+        <FLEXTREECOMPONENT name = "OverviewTree"
+                           init = "overviewTree"
+                           refresh = "true"
+                           records = "25">
+
+          <DBCONNECT type = "global"/>
+
+          <TREE name = "overviewTree" root = "Sorter Areas">
+            <!-- optional icons for each tree level  -->
+            <TREEICON level = "0" iconType = "standard" icon = "sorter4.gif" micon="sorter4"/>
+            <TREEICON level = "1" iconType = "standard" icon = "sorter3.gif" micon="sorter3"/>
+
+            <SELECT level = "0" sql = "select description, areaId
+                                         from sorterAreas"/>
+
+            <DEFAULT_TREE_MODIFIER sql = " order by displayOrder"/>
+          </TREE>
+        </FLEXTREECOMPONENT>
+
+      <TABPANE tabplacement = "bottom">
+        <TAB title = "Recirc Increment/Reset">
+          <FLEXTABLECOMPONENT name = "incDec" init = "incDecTable"
+                              greenbar = "true" refresh = "true"
+                              refreshOnUpdate = "true" refreshOnInsert = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "OverviewTree"/>
+
+            <TABLE key = "overviewTree.0">
+              <SELECT sql = "with sorters(Area, AreaDisplayOrder, Sorter, DisplayRoutes, IncrementAtScanner, ResetAtScanner, ResetAtLane, IncrementAtLane) as
+                             (select sa.Description, sa.displayOrder, si.Description, si.displayRoutes,
+                                     if(si.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0) then 'Yes' else 'No' endif IncAtScanner,
+                                     if(si.flags &amp; MnemonicCodesViewGetStatus('RESET_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0) then 'Yes' else 'No' endif ResetAtScanner,
+                                     if(sls.flags &amp; MnemonicCodesViewGetStatus('CLEAR_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') > 0) then sls.laneNo else null endif ClearAtLane,
+                                     if(sls.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') > 0) then sls.laneNo else null endif IncAtLane
+                                from sorterAreas sa
+                                join sorterIds si
+                                join sorterLaneStatuses sls
+                                  on sls.sorterId = si.sorterId
+                               where si.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0
+                                  or sls.flags &amp; (MnemonicCodesViewGetStatus('CLEAR_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') |
+                                                  MnemonicCodesViewGetStatus('INC_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS')) > 0)
+                             select Area, AreaDisplayOrder, Sorter, DisplayRoutes, IncrementAtScanner, ResetAtScanner,
+                                    list(IncrementAtLane) IncrementAtLanes,
+                                    list(ResetAtLane) ResetAtLanes
+                               from sorters
+                              group by Area, AreaDisplayOrder, Sorter, IncrementAtScanner, ResetAtScanner, DisplayRoutes
+                              order by areaDisplayOrder, displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "AreaDisplayOrder"
+                             hide = "true"/>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+
+            <TABLE key = "overviewTree.1">
+              <SELECT sql = "with sorters(Sorter, DisplayRoutes, IncrementAtScanner, ResetAtScanner, ResetAtLane, IncrementAtLane) as
+                             (select si.Description, si.displayRoutes,
+                                     if(si.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0) then 'Yes' else 'No' endif IncAtScanner,
+                                     if(si.flags &amp; MnemonicCodesViewGetStatus('RESET_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0) then 'Yes' else 'No' endif ResetAtScanner,
+                                     if(sls.flags &amp; MnemonicCodesViewGetStatus('CLEAR_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') > 0) then sls.laneNo else null endif ClearAtLane,
+                                     if(sls.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') > 0) then sls.laneNo else null endif IncAtLane
+                                from sorterIds si
+                                join sorterLaneStatuses sls
+                                  on sls.sorterId = si.sorterId
+                               where si.areaId = //overviewTree.1
+                                 and (si.flags &amp; MnemonicCodesViewGetStatus('INC_RECIRC_AT_SCANNER', 'SORTER_ID_FLAGS') > 0
+                                  or sls.flags &amp; (MnemonicCodesViewGetStatus('CLEAR_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS') |
+                                                  MnemonicCodesViewGetStatus('INC_RECIRC_COUNT', 'SORTER_LANE_STATUS_FLAGS')) > 0))
+                             select Sorter, DisplayRoutes, IncrementAtScanner, ResetAtScanner,
+                                    list(IncrementAtLane) IncrementAtLanes,
+                                    list(ResetAtLane) ResetAtLanes
+                               from sorters
+                              group by Sorter, IncrementAtScanner, ResetAtScanner, DisplayRoutes
+                              order by displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+
+        <TAB title = "Recirc Reject Assignments">
+          <FLEXTABLECOMPONENT name = "recircRejectAssignments" init = "recircRejectAssignmentsTable"
+                              greenbar = "true" refresh = "true"
+                              refreshOnUpdate = "true" refreshOnInsert = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "OverviewTree"/>
+
+            <TABLE key = "overviewTree.0">
+              <SELECT sql = "select sa.Description Area, sa.DisplayOrder,
+                                    si.Description Sorter, coalesce(si.recircMax, sa.recircMax) RecircMax,
+                                    si.displayRoutes, list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'RECIRC_REJECT'
+                              group by Area, sa.DisplayOrder, Sorter, si.DisplayRoutes, RecircMax
+                              order by sa.displayOrder, si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayOrder"
+                             hide = "true"/>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+
+            <TABLE key = "overviewTree.1">
+              <SELECT sql = "select si.Description Sorter, si.displayRoutes,
+                                    coalesce(si.recircMax, sa.recircMax) RecircMax,
+                                    list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'RECIRC_REJECT'
+                              where si.areaId = //overviewTree.1
+                              group by Sorter, si.DisplayRoutes, RecircMax
+                              order by si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+
+        <TAB title = "Max No-Read Assignments">
+          <FLEXTABLECOMPONENT name = "maxNoReadAssignments" init = "maxNoReadAssignmentsTable"
+                              greenbar = "true" refresh = "true"
+                              refreshOnUpdate = "true" refreshOnInsert = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "OverviewTree"/>
+
+            <TABLE key = "overviewTree.0">
+              <SELECT sql = "select sa.Description Area, sa.DisplayOrder, si.Description Sorter,
+                                    coalesce(si.noReadMax, sa.noReadMax) NoReadMax,
+                                    si.displayRoutes, list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'MAX_NOREAD'
+                              group by Area, sa.DisplayOrder, Sorter, si.DisplayRoutes, NoReadMax
+                              order by sa.displayOrder, si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayOrder"
+                             hide = "true"/>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+
+            <TABLE key = "overviewTree.1">
+              <SELECT sql = "select si.Description Sorter, si.displayRoutes,
+                                    coalesce(si.noReadMax, sa.noReadMax) NoReadMax,
+                                    list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'MAX_NOREAD'
+                              where si.areaId = //overviewTree.1
+                              group by Sorter, si.DisplayRoutes, NoReadMax
+                              order by si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+
+        <TAB title = "Max No-Record Assignments">
+          <FLEXTABLECOMPONENT name = "maxNoRecordAssignments" init = "maxNoRecordAssignmentsTable"
+                              greenbar = "true" refresh = "true"
+                              refreshOnUpdate = "true" refreshOnInsert = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "OverviewTree"/>
+
+            <TABLE key = "overviewTree.0">
+              <SELECT sql = "select sa.Description Area, sa.DisplayOrder, si.Description Sorter,
+                                    coalesce(si.noRecordMax, sa.noRecordMax) NoRecordMax,
+                                    si.displayRoutes, list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'MAX_NORECORD'
+                              group by Area, sa.DisplayOrder, Sorter, si.DisplayRoutes, NoRecordMax
+                              order by sa.displayOrder, si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayOrder"
+                             hide = "true"/>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+
+            <TABLE key = "overviewTree.1">
+              <SELECT sql = "select si.Description Sorter, si.displayRoutes,
+                                    coalesce(si.noRecordMax, sa.noRecordMax) NoRecordMax,
+                                    list(ri.laneNo) Lanes
+                               from sorterAreas sa
+                               join sorterIds si
+                               join routeIds ri
+                                 on ri.sorterId = si.sorterId
+                                and ri.routeId = 'MAX_NORECORD'
+                              where si.areaId = //overviewTree.1
+                              group by Sorter, si.DisplayRoutes, NoRecordMax
+                              order by si.displayRoutes"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "DisplayRoutes"
+                             hide = "true"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+      </TABPANE>
+      </SPLITPANE>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

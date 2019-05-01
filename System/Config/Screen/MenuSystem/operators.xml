@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     operators.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: operators.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Operators/Notifications" height = "500"
+            width = "750" frametype = "internal"
+            updateSecurity = "operators.edit"
+            insertSecurity = "operators.edit"
+            deleteSecurity = "operators.edit" >
+
+  <DBCONNECT type = "predefined" connectionId = "default"
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTOR name = "messageTypes"
+            loadSql = "select messageType
+                         from systemLogMessageTypes
+                        where notification = 'Y'
+                        order by messageType" />
+
+    <VECTOR name = "operators1">
+      <ITEM value = " =" />
+      <ITEM value = "like" />
+    </VECTOR>
+
+    <VECTORMAP name = "yesNoMap">
+      <ITEM key = "N" value = "No" />
+      <ITEM key = "Y" value = "Yes" />
+    </VECTORMAP>
+
+    <VECTOR name = "yesNoValues">
+      <ITEM value = "No" />
+      <ITEM value = "Yes" />
+    </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <SPLITPANE  divider = "150" >
+    <FLEXTREECOMPONENT name = "OperatorTree" init = "operatorTree"
+                       records = "25" refresh = "true">
+      <DBCONNECT type = "global" />
+      <TREE name = "operatorTree" root = "Operator">
+
+        <!-- optional icons for each tree level  -->
+        <TREEICON level = "0" iconType = "standard" icon = "users.png" micon="users"/>
+        <TREEICON level = "1" iconType = "standard" icon = "users.png" micon="users"/>
+
+        <SELECT level = "0" sql = "select id
+                                     from operators
+                                    where id not in ('default_user',
+                                                     'security_template')" />
+        <DEFAULT_TREE_MODIFIER sql = " order by id " />
+
+        <TREE_OPTIONS_BUTTON text = "Search Options..." foreColor = "blue" />
+
+        <TREE_MODIFIERS_DIALOG title = "Search Options"
+                               okButtonText = "Okay"
+                               filterBorderText = "Search Criteria"
+                               filterBorderColor = "blue"
+                               orderBorderText = "Order By"
+                               orderBorderColor = "blue"
+                               reorderButtonText = "ReOrder"
+                               editorWidth = "160"
+                               appendAsAnd = "true" >
+
+          <DBCONNECT type = "global" />
+
+          <COUNT_SQL sql = "select count(id)
+                              from operators
+                             where id not in ('default_user',
+                                              'security_template')" />
+
+          <FILTER_OPTION label = "Operator Id" altValue = "id"
+                         editorType = "text" autoQuote = "true" >
+            <OPERATORS ifdef = "operators1" />
+          </FILTER_OPTION>
+
+          <ORDER_OPTION  label = "order" editorType = "combo">
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "Operator Id Asc"
+                            altValue = "id asc" />
+              <COMBO_OPTION value = "Operator Id Desc"
+                            altValue = "id desc" />
+            </COMBO_OPTIONS>
+          </ORDER_OPTION>
+        </TREE_MODIFIERS_DIALOG>
+      </TREE>
+    </FLEXTREECOMPONENT>
+
+    <TABPANE tabplacement = "top">
+
+      <TAB title = "Operators" >
+        <FLEXTABLECOMPONENT name = "OperatorTable" greenbar = "true" >
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "OperatorTree" />
+
+          <TABLE key = "operatorTree.0" >
+            <SELECT sql = "select id OperatorId, FirstName, LastName,
+                                  EmailAddress, TextAddress
+                             from operators
+                            where id not in ('default_user',
+                                             'security_template')
+                            order by id" />
+
+            <UPDATE sql = "update operators
+                              set FirstName = //FirstName,
+                                  LastName = //LastName,
+                                  EmailAddress = //EmailAddress,
+                                  TextAddress = //TextAddress,
+                                  ts = now()
+                            where id = //OperatorId" />
+          </TABLE>
+
+          <TABLE key = "operatorTree.1" >
+            <SELECT sql = "select FirstName, LastName,
+                                  EmailAddress, TextAddress
+                             from operators
+                            where id = //operatorTree.1" />
+
+            <UPDATE sql = "update operators
+                              set FirstName = //FirstName,
+                                  LastName = //LastName,
+                                  EmailAddress = //EmailAddress,
+                                  TextAddress = //TextAddress,
+                                  ts = now()
+                            where id = //operatorTree.1" />
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </TAB>
+
+      <TAB  title = "Notifications" >
+        <FLEXTABLECOMPONENT name = "NotificationsTable"
+                            greenbar = "true" >
+          <DBCONNECT type = "global" />
+
+          <TRIGGER name = "OperatorTree" />
+
+          <TABLE key = "operatorTree.0" >
+            <SELECT sql = "select id OperatorId, MessageType,
+                                  EmailNotify, TextNotify
+                             from systemLogNotifications
+                            order by id, messageType" />
+
+            <DELETE sql = "delete from systemLogNotifications
+                            where messageType = //MessageType
+                              and id = //OperatorId" />
+
+            <UPDATE sql = "update systemLogNotifications
+                              set EmailNotify = //EmailNotify,
+                                  TextNotify = //TextNotify
+                            where messageType = //MessageType
+                              and id = //OperatorId" />
+
+            <ALTVALUES>
+              <FIELD name = "EmailNotify" ifdef = "yesNoMap" />
+              <FIELD name = "TextNotify" ifdef = "yesNoMap" />
+            </ALTVALUES>
+          </TABLE>
+
+          <TABLE key = "operatorTree.1" >
+            <SELECT sql = "select MessageType, EmailNotify,
+                                  TextNotify
+                             from systemLogNotifications
+                            where id = //operatorTree.1
+                            order by messageType" />
+
+            <DELETE sql = "delete from systemLogNotifications
+                            where messageType = //MessageType
+                              and id = //operatorTree.1" />
+
+            <INSERT sql = "insert into systemLogNotifications(messageType,
+                                                              id,
+                                                              emailNotify,
+                                                              textNotify,
+                                                              pagerNotify)
+                           values(//MessageType, //operatorTree.1,
+                                  //EmailNotify, //TextNotify,
+                                  'N')" />
+
+            <UPDATE sql = "update systemLogNotifications
+                              set EmailNotify = //EmailNotify,
+                                  TextNotify = //TextNotify
+                            where messageType = //MessageType
+                              and id = //operatorTree.1" />
+
+            <ALTVALUES>
+              <FIELD name = "EmailNotify" ifdef = "yesNoMap" />
+              <FIELD name = "TextNotify" ifdef = "yesNoMap" />
+            </ALTVALUES>
+
+            <EDITOR restoreHide = "true">
+              <FIELD name = "MessageType">
+                <COMBO editable = "false" ifdef = "messageTypes"/>
+              </FIELD>
+
+              <FIELD name = "EmailNotify">
+                <COMBO editable = "false" ifdef = "yesNoValues" />
+              </FIELD>
+
+              <FIELD name = "TextNotify">
+                <COMBO editable = "false" ifdef = "yesNoValues" />
+              </FIELD>
+            </EDITOR>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </TAB>
+    </TABPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

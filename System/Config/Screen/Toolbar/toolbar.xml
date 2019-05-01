@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     toolbar.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: toolbar.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<toolbar>
+    <ToolBar floatable = "true" height = "30">
+      <button commandId   = "exit"
+              commandMenu = "file"
+              text        = ""
+              handler     = "defaultCommand"
+              security    = "false"
+              tooltip     = "Close Application"
+              icon        = "exit.png"
+              iconType    = "standard"
+              micon       = "close"/>
+
+      <button commandId   = "processes"
+              commandMenu = "file"
+              text        = ""
+              handler     = "defaultScreen"
+              tooltip     = "System Processes"
+              icon        = "gears.png"
+              iconType    = "standard"
+              micon       = "cogs"/>
+
+      <button commandId   = "securityAdmin"
+              commandMenu = "system"
+              text        = ""
+              handler     = "defaultScreen"
+              tooltip     = "Security Administration"
+              icon        = "fKey.gif"
+              iconType    = "standard"
+              micon       = "key"/>
+
+      <button commandId   = "sortDestinations"
+              commandMenu = "operations"
+              text        = ""
+              handler     = "defaultScreen"
+              tooltip     = "Sort Destinations"
+              icon        = "description.gif"
+              iconType    = "standard"
+              micon       = "sort"/>
+
+      <button commandId   = "scannerLog"
+              commandMenu = "display"
+              text        = ""
+              handler     = "defaultScreen"
+              tooltip     = "Scanner Log"
+              icon        = "activity.png"
+              iconType    = "standard"
+              micon       = "activity" />
+
+      <button commandId   = "orderStatus"
+              commandMenu = "operations"
+              text        = ""
+              handler     = "defaultScreen"
+              tooltip     = "Order Status"
+              icon        = "workOrders.gif"
+              iconType    = "standard"
+              micon       = "clipboard" />
+    </ToolBar>
+</toolbar>

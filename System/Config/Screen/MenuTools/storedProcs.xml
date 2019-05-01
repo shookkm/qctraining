@@ -1,0 +1,251 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     storedProcs.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: storedProcs.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title           = "Stored Procedures"
+            height          = "550"
+            width           = "1100"
+            frametype       = "internal"
+            globalThreading = "true">
+
+  <DBCONNECT type         = "predefined"
+             connectionId = "default"
+             setglobal    = "true"/>
+
+  <INIT_ACTIONS>
+  </INIT_ACTIONS>
+
+  <GLOBAL_DEFINITIONS>   
+    <VECTOR name = "creators"
+            loadSql = "select '' Creator
+                       union 
+                       select distinct Creator
+                         from sys.SYSPROCS
+                         order by Creator" />
+  
+     <VECTORMAP name = "orderByList">
+      <ITEM key = "Procedure Name asc"   value = "p.procName asc" />
+      <ITEM key = "Procedure Name desc"  value = "o.procName" />
+    </VECTORMAP>
+ </GLOBAL_DEFINITIONS>
+
+  <BORDER_COMPONENT orientation = "south" >
+
+    <ACTIVITY_PANEL labelColor = "red" messageColor = "blue" >
+      <SOURCE sourceName = "ProcedureList" />
+      <SOURCE sourceName = "StatusTable" />
+    </ACTIVITY_PANEL>
+
+  </BORDER_COMPONENT>
+
+  <SPLITPANE  divider = "90" orientation = "vertical" >
+
+    <FLEXSQLMODIFIERCOMPONENT name              = "ProcedureFilter"
+                              appendAsAnd       = "false"
+                              makeAbsolute      = "true"
+                              autoResize        = "false"
+                              autoExecute       = "true"
+                              labelsOnTop       = "false"
+                              maxFilterRows     = "2"
+                              editorWidth       = "200"
+                              showCheckBoxes    = "false"
+                              filterBorderText  = "Filter Criteria"
+                              filterBorderColor = "blue"
+                              okButtonText      = "Execute"
+                              passiveMode       = "true"
+                              orientation       = "horizontal"
+                              roundedCorners    = "true" >
+
+      <DBCONNECT type = "global"/>
+
+      <FILTER_OPTION label      = "Procedure"
+                     altValue   = "procedureName"
+                     editorType = "text"
+                     autoQuote  = "true" />
+                                                      
+      <FILTER_OPTION label = "Creators"
+                     altValue = "creator"
+                     editorType = "combo"
+                     autoQuote = "true">
+        <COMBO_OPTIONS ifdef = "creators">
+        </COMBO_OPTIONS>
+      </FILTER_OPTION>
+                                                      
+      <FILTER_OPTION label      = "Domain"
+                     altValue   = "domain"
+                     editorType = "text"
+                     autoQuote  = "true" />
+                                                      
+       <FILTER_OPTION label = "Order By"
+                     altValue = "orderBy"
+                     editorType = "combo"
+                     autoQuote = "true" >
+        <COMBO_OPTIONS ifdef = "orderByList" />
+      </FILTER_OPTION>
+      
+    </FLEXSQLMODIFIERCOMPONENT>
+    
+    <SPLITPANE divider = "250" 
+               orientation = "horizontal" >
+
+      <FLEXLISTCOMPONENT name     = "ProcedureList"
+                         greenbar = "true"
+                         records = "1000"
+                         log      = "true">
+
+        <DBCONNECT type = "global" />
+        <TRIGGER name = "ProcedureFilter" />
+        <LIST key   = "ProcedureFilter:execute"
+              title = "Procedures"
+              icon  = "workorder.gif"
+              color = "sienna" >
+
+          <SELECT sql = "call StoredProcedureScreen(//procedureName,
+                                                    //creator,
+                                                    //domain,
+                                                    //orderBy)" />
+
+        </LIST>
+      </FLEXLISTCOMPONENT>
+     
+      <TABPANE>
+        <TAB title = "Arguments">
+          <!--
+          - Every flex component has a name which is needed for referencing
+          - and attaching listeners.
+          -->
+          <FLEXTABLECOMPONENT name     = "ProcedureArgs"
+                              greenbar = "true"
+                              log      = "true">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ProcedureList" />
+            <TABLE key = "ProcedureList"
+                   title = "Arguments">
+              <SELECT sql = "select pm.parmName ParmName, 
+                                    pm.ParmMode,
+                                    pm.user_type Domain, 
+                                    pm.parmdomain Type,
+                                    pm.Length,
+                                    pm.Scale
+                               from sys.SYSPROCS p
+                               join sys.sysprocparms pm
+                                 on p.procName = pm.procName
+                               where p.procname = //ProcedureList
+                               order by pm.parm_id" />
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "ParmName"
+                              align = "left"/>
+                              
+                <TABLECOLUMN name = "ParmMode"
+                             maxWidth = "80"/>    
+                              
+                <TABLECOLUMN name = "Domain"
+                             maxWidth = "120"/>  
+                             
+                <TABLECOLUMN name = "Type"
+                             maxWidth = "80"/>  
+                             
+                <TABLECOLUMN name = "Length"
+                             maxWidth = "50"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Scale"
+                             maxWidth = "50"
+                             align = "right"/>
+              </TABLECOLUMNS>       
+              
+              <ALTVALUES>
+              </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+      
+        <TAB title = "Source">
+          <FLEXTEXTCOMPONENT name = "ProcedureText" >
+            <!-- has triggers and dbconnect like all flex components -->
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ProcedureList" />
+            <!-- can have as many TEXT elements as needed, one for every expected key -->
+            <TEXT key = "ProcedureList" 
+                  title = "Procedure">
+              <!-- can supply one document class for each text element for syntax highlighting -->
+              <DOCUMENT class = "Swing.Text.SqlSyntaxDocument" />
+              <!-- must have a select defined if you expect to display anything; note the select can return
+               anything you want but only the first column of the first record of the result set will be
+             displayed -->
+              <SELECT sql = "select pr.Source
+                               from sys.SYSPROCS p
+                               join sys.sysprocedure pr
+                                 on p.procName = pr.proc_name
+                               where p.procName = //ProcedureList" />
+            </TEXT>
+          </FLEXTEXTCOMPONENT>  
+        </TAB>
+        
+        <TAB title = "Proc Xref">
+          <FLEXTABLECOMPONENT name = "ProcXref" >
+            <!-- has triggers and dbconnect like all flex components -->
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ProcedureList" />
+            <TABLE key = "ProcedureList"
+                   title = "Proc Xfer">
+              <SELECT sql = "select CalledBy
+                               from StoredProcXref
+                               where procedureName = //ProcedureList
+                               order by CalledBy" />
+            </TABLE>    
+          </FLEXTABLECOMPONENT>            
+        </TAB>
+        
+        <TAB title = "Domains">
+          <!--
+          - Every flex component has a name which is needed for referencing
+          - and attaching listeners.
+          -->
+          <FLEXTABLECOMPONENT name     = "Domains"
+                              greenbar = "true"
+                              log      = "true">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ProcedureList" />
+            <TABLE key = "ProcedureList"
+                   title = "Domains">
+              <SELECT sql = "select type_name Domain, 
+                                    domain_name Type,
+                                    Width,
+                                    Scale
+                               from SYSDOMAIN
+                               join SYSUSERTYPE 
+                               order by type_name" />
+
+              <TABLECOLUMNS>                              
+                <TABLECOLUMN name = "Type"
+                             maxWidth = "80"/>  
+                             
+                <TABLECOLUMN name = "Width"
+                             maxWidth = "50"
+                             align = "right"/>
+                             
+                <TABLECOLUMN name = "Scale"
+                             maxWidth = "50"
+                             align = "right"/>
+              </TABLECOLUMNS>       
+              
+              <ALTVALUES>
+              </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </TAB>
+      </TABPANE>
+    </SPLITPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

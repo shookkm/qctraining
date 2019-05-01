@@ -1,0 +1,298 @@
+<!--
+ - Filename:     inventoryMaintTabPallets.xml
+ - Description:
+ -
+ - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+ - No part of this copyrighted work may be reproduced, modified, or
+ - distributed in any form or by any means without the prior written
+ - permission of Queen City Software, Inc.
+ -
+ - $Id: inventoryMaintTabPallets.xml 9953 2018-03-27 19:48:38Z rlh $
+ - Notes:
+-->
+<inventoryMaintTabPallets>
+    <TAB title = "Pallets">
+      <SPLITPANE divider="160">
+        <FLEXSQLMODIFIERCOMPONENT
+          name="PalletsFilter"
+          appendAsAnd="false"
+          makeAbsolute="true"
+          autoResize="false"
+          autoExecute="true"
+          labelsOnTop="true"
+          maxFilterRows="7"
+          editorWidth="130"
+          showCheckBoxes="false"
+          filterBorderText="Filter Criteria"
+          filterBorderColor="blue"
+          okButtonText="Execute"
+          passiveMode="false"
+          orientation="vertical">
+
+          <DBCONNECT
+            type="global"
+            connectionId="epicor" />
+
+          <FILTER_OPTION
+            label="Unit"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="UnitType"
+            editorType="combo"
+            autoQuote="true">
+            <COMBO_OPTIONS
+              ifdef="unitTypes"
+              loadEmptyItem="true" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="MasterZoneId"
+            editorType="combo"
+            autoQuote="true">
+            <COMBO_OPTIONS
+              ifdef="masterZoneIds"
+              loadEmptyItem="false" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="ZoneId"
+            editorType="text"
+            autoQuote="true">
+          </FILTER_OPTION>
+
+          <FILTER_OPTION
+            label="LocationId"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="StorageId"
+            editorType="text"
+            autoQuote="true" />
+
+          <FILTER_OPTION
+            label="PalletId"
+            editorType="text"
+            autoQuote="true" />
+
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <SPLITPANE divider = "140" 
+                   orientation = "vertical" >
+            <!-- every flex component has a name which is needed for referencing and attaching listeners-->
+          <FLEXTABLECOMPONENT name = "palletTable"
+                              init = "init" 
+                              greenbar = "true"
+                              refresh = "true"
+                              refreshOnUpdate = "true"
+                              refreshOnInsert = "true"
+                              ignoreEventConcatenation = "true">
+            <DBCONNECT type = "global" />
+  
+            <!-- name of component being listened to -->
+            <TRIGGER name = "PalletsFilter" />
+  
+            <TABLE key = "PalletsFilter:execute" 
+                   title = "Pallets">
+              <SELECT sql = "call MuPalletScreen(//PalletId,
+                                                 //Unit,
+                                                 //UnitType,
+                                                 //MasterZoneId,
+                                                 //ZoneId,
+                                                 //Location,
+                                                 //StorageId)" />
+  
+              <UPDATE sql = "update MoveableUnitClusters 
+                               set operatorId = //OperatorId
+                               Where clusterId = //PalletId "/>
+                               
+              <!--<DELETE sql = "call InventoryPalletDelete(/*PalletId,
+                                                        //LocationId,
+                                                         '$QC_USER')" />   -->
+  
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Flags"  
+                             align = "right" />
+                <TABLECOLUMN name = "Cartons"  
+                             align = "right" />
+                <TABLECOLUMN name = "TotalQty"  
+                             align = "right" />
+              </TABLECOLUMNS>
+              
+              <ALTVALUES>              
+                <FIELD name = "Status" 
+                       ifdef = "clusterStatuses" />
+                <FIELD name = "Flags" 
+                       ifdef = "muClusterFlags" />
+              </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <SPLITPANE divider = "120" 
+                     orientation = "vertical" >
+            
+            <FLEXTABLECOMPONENT name = "PalletUnitTable"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+  
+              <!-- name of component being listened to -->
+              <TRIGGER name = "palletTable" />
+  
+              <TABLE key = "palletTable:PalletsFilter:execute"
+                     title = "Pallet Skus">
+                <SELECT sql = "call InventoryPalletUnits(//PalletId,
+                                                         //StorageId,
+                                                         //Unit,
+                                                         //UnitType)"/>
+  
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "Unit"   
+                               preferredWidth = "80"
+                               maxWidth = "100"/>
+                  <TABLECOLUMN name = "UnitType"   
+                               preferredWidth = "80"
+                               maxWidth = "90"/>
+                  <TABLECOLUMN name = "Qty"   
+                               preferredWidth = "70"
+                               maxWidth = "80"                
+                               align = "right"/>
+                  <TABLECOLUMN name = "Cartons"   
+                               preferredWidth = "70"
+                               maxWidth = "80"                
+                               align = "right"/>
+                  <TABLECOLUMN name = "CasePack"   
+                               preferredWidth = "70"
+                               maxWidth = "80"                
+                               align = "right"/>
+                </TABLECOLUMNS>
+                
+                <ALTVALUES>
+                </ALTVALUES>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+            
+            <SPLITPANE divider = "170" 
+                   orientation = "vertical" >
+            <FLEXTABLECOMPONENT name = "palletLowerTable"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+  
+              <!-- name of component being listened to -->
+              <TRIGGER name = "PalletUnitTable" />
+              <InsertInterpreter>
+                <Field name = "Sku" 
+                       searchField = "Sku" 
+                       searchParent = "true" />
+                <Field name = "Unit Type" 
+                       searchField = "UnitType" 
+                       searchParent = "true" />
+                <Field name = "Location" 
+                       searchField = "Location" 
+                       searchTable = "true" />
+                <Field name = "CasePackQty" 
+                       searchField = "CasePackQty" 
+                       searchTable = "true" />
+                <Field name = "Storage Id" 
+                       defaultValue = "Either CartonId or Delete"/>
+              </InsertInterpreter>
+  
+              <TABLE key = "PalletUnitTable:palletTable:PalletsFilter:execute"
+                     title = "Pallet Cartons">
+                <SELECT sql = "call InventoryPalletCartons(//PalletId,
+                                                           //StorageId,
+                                                           //Unit,
+                                                           //UnitType,
+                                                           //CasePack)"/>
+                                                           
+                <INSERT sql = "call InventoryPalletCartonInsert(//LocationId,
+                                                                //PalletId,
+                                                                //StorageId,
+                                                                //Unit,
+                                                                //UnitType,
+                                                                //CasePackQty,
+                                                               '$QC_USER')"/>
+                                                           
+                <DELETE sql = "call InventoryPalletCartonDelete(/*StorageId,
+                                                                /*LocationId,
+                                                                /*Unit,
+                                                                /*UnitType,
+                                                                '$QC_USER')"/>
+  
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "StorageId"   
+                               preferredWidth = "70"
+                               maxWidth = "80"/>
+                  <TABLECOLUMN name = "ClusterId"   
+                               preferredWidth = "70"
+                               maxWidth = "80"/>
+                  <TABLECOLUMN name = "Qty"   
+                               preferredWidth = "50"
+                               maxWidth = "60"                
+                               align = "right"/>
+                  <TABLECOLUMN name = "LocationId"   
+                               preferredWidth = "60"
+                               maxWidth = "80"/>
+                  <TABLECOLUMN name = "CasePackQty"  
+                               preferredWidth = "50"
+                               maxWidth = "80"                
+                               align = "right" />
+                  <TABLECOLUMN name = "Flags"   
+                               preferredWidth = "60"
+                               maxWidth = "70"                
+                               align = "right"/>
+                  <TABLECOLUMN name = "Status"   
+                               preferredWidth = "60"
+                               maxWidth = "70"                
+                               align = "right"/>
+                </TABLECOLUMNS>
+                
+                <ALTVALUES>
+                  <FIELD name = "Status" 
+                         ifdef = "storageStatuses" />
+                  <FIELD name = "Flags" 
+                         ifdef = "flagsStatuses" />
+                </ALTVALUES>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+            
+            <FLEXBUTTONPANEL name="DeletePallet" rows = "1" columns="1"
+                           pad="3" verticalBorder="10" horizontalBorder="100"
+                           autoCommit = "true" handleResult = "true"
+                           messageMode = "popup" 
+                           securityId="inventoryMaintenance.edit"
+                           parentRequired = "true"
+                           enableWarning = "false">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "palletTable" />
+            <BUTTON name = "dummy1" 
+                    text = ""   visible = "false" />
+              <BUTTON name = "Delete" 
+                      text = "Delete Pallet"
+                      foreground = "blue"
+                      action     = "refresh"
+                      securityId = "inventoryMaintenance.edit"
+                      maxSize    = "150, 35"
+                      enabled    = "false">
+                      
+                <SQL_COMMAND sqlType = "returnErrMsg"
+                             sql     = "call InventoryPalletDelete(//PalletId, 
+                                                                   //LocationId,
+                                                                   '$QC_USER')"
+                             successMessage = "Success!" />
+              </BUTTON>
+            
+            
+            <BUTTON name = "dummy2" 
+                    text = "" 
+                    visible = "false"  />
+          </FLEXBUTTONPANEL>
+          </SPLITPANE>
+          </SPLITPANE>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+</inventoryMaintTabPallets>

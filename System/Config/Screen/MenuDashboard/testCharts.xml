@@ -1,0 +1,274 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     testCharts.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: testCharts.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Test Charts" 
+            height = "750" 
+            width = "1200" 
+            frametype = "internal"
+            report = "true"
+            updateSecurity = "orderCounts.edit" 
+            insertSecurity = "orderCounts.edit"
+            deleteSecurity = "orderCounts.edit" >
+
+	<!-- a dbConnect here is a universal connect object  -->
+	<DBCONNECT type = "predefined" 
+             connectionId = "default" 
+             setglobal = "true"/>
+
+	<SPLITPANE divider = "60" 
+                 orientation = "vertical">
+		<FLEXSQLMODIFIERCOMPONENT  name = "chartFilter"
+                       appendAsAnd = "false"
+                       makeAbsolute = "true"
+                       autoResize = "false"
+                       autoExecute = "true"
+                       labelsOnTop = "false"
+                       maxFilterRows = "1"
+                       editorWidth = "90"
+                       showCheckBoxes = "false"
+                       filterBorderText = "Filter Criteria"
+                       filterBorderColor = "blue"
+                       okButtonText = "Execute"
+                       passiveMode = "true"
+                       orientation = "horizontal"
+                       roundedCorners = "true" >
+
+			<DBCONNECT type = "global" />
+
+			<FILTER_OPTION label = "From Date"
+                     altValue = "fromDate"
+                     editorType = "calendar"
+                     autoQuote = "true" >
+				<CALENDAR_OPTIONS  pastEnabled = "true" 
+                           deselectEnabled = "false"
+                           monthsPast = "6" 
+                           monthsFuture = "2"
+								           date = "-1"
+                           format = "yyyy-MM-dd"/>
+			</FILTER_OPTION>
+
+			<FILTER_OPTION label = "To Date"
+                     altValue = "toDate"
+                     editorType = "calendar"
+                     autoQuote = "true" >
+				<CALENDAR_OPTIONS  pastEnabled = "true" 
+                           deselectEnabled = "false"
+                           monthsPast = "6" 
+                           monthsFuture = "2"
+							             date = "0"
+                           format = "yyyy-MM-dd"/>
+			</FILTER_OPTION>
+
+		</FLEXSQLMODIFIERCOMPONENT>
+
+		<SPLITPANE divider = "400" 
+               orientation = "vertical">
+
+			<SPLITPANE divider = "600" 
+                 orientation = "horizontal">
+				<FLEXFXCHARTCOMPONENT>
+
+					<TRIGGER name = "chartFilter" />
+					<DBCONNECT type = "global" />
+
+					<CHART type = "bar" 
+                 key = "chartFilter:execute:BAR" 
+                 chartTitle = "Orders per Wave" 
+                 x-axisLabel = "Wave Number" 
+                 y-axisLabel = "Orders"
+                 queryDataColumn = "1" 
+                 columnTagData = "2"
+                 totalRow = "false"
+                 chartColor = "red"
+                 isHorizontal = "false"
+                 showLegend = "true"
+                 autoRefresh = "false"> 
+
+						<!--  optional  
+						<TARGET_COLUMNS>  
+							<Column name = "Day" />
+							<COLUMN name = "Loading" />
+							<COLUMN name = "Idle" />
+							<COLUMN name = "Prepared" />
+							<COLUMN name = "Released" />
+							<COLUMN name = "Picking" />
+							<COLUMN name = "Complete" />
+						</TARGET_COLUMNS>  -->
+
+						<SQL sql = "select count(*), waveNo
+                          from workorders
+                          where waveNo != 0
+                            and ts between //fromDate and //toDate
+                          group by waveNo" />
+
+					</CHART>	  
+
+				</FLEXFXCHARTCOMPONENT>   
+
+				<FLEXFXCHARTCOMPONENT>
+					<TRIGGER name = "chartFilter" />
+					<DBCONNECT type = "global" />
+					
+					<COLORSERIES series = "#DB5929,#E5991F,#57AC57,#3F9CB8,#495DC2,#974AC1,#BC4362,#7D7D7D" />
+
+					<CHART type = "pie" 
+                 key = "chartFilter:execute:BAR" 
+                 chartTitle = "Orders per Wave" 
+                 x-axisLabel = "Wave Number" 
+                 y-axisLabel = "Orders"
+                 queryDataColumn = "2" 
+                 columnTagData = "1"
+                 totalRow = "false"
+                 showLegend = "false"
+                 autoRefresh = "false">  
+
+						<SQL sql = "call PmDashboardReleaseCompletePie();"/>
+
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>	 
+			</SPLITPANE>
+
+			<SPLITPANE divider = "600" 
+                 orientation = "horizontal">				
+				<FLEXFXCHARTCOMPONENT name = "testStackedBarChart">
+
+					<TRIGGER name = "chartFilter" />
+					<DBCONNECT type = "global" />
+
+					<CHART type = "stackedBar" 
+                 key = "chartFilter:execute:SBar" 
+                 chartTitle = "Stacked Bar Example" 
+                 x-axisLabel = "X Axis" 
+                 y-axisLabel = "Y Axis"
+                 queryDataColumn = "1" 
+                 columnTagData = "2"
+                 totalRow = "false"
+                 numberOfBarSeries = "3"
+                 showLegend = "true"
+                 legendNameColumn = "3"
+                 autoRefresh = "false">
+							 
+							 <!-- Must specify the number of series, throws errors if the number is higher that sql statements below 
+							           limitted to just 8 series currently -->  
+
+						<SQL series1Sql = "select orderCount, zoneId, category from PmDashboardOrderCounts where category = 'Picked' order by zoneId"
+
+							   series2Sql = "select orderCount, zoneId, category from PmDashboardOrderCounts where category = 'Released' order by zoneId"
+							
+							   series3Sql = "select orderCount, zoneId, category from PmDashboardOrderCounts where category = 'Not Released' order by zoneId"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>	 
+
+				<FLEXFXCHARTCOMPONENT>
+					<TRIGGER name = "chartFilter" />
+					<DBCONNECT type = "global" />
+
+					<CHART type = "line" 
+                 key = "chartFilter:execute:BAR" 
+                 chartTitle = "Orders per Wave" 
+                 x-axisLabel = "Wave Number" 
+                 y-axisLabel = "Orders"
+                 queryDataColumn = "1" 
+                 columnTagData = "2"
+                 totalRow = "false"
+                 numberOfSeries = "2"
+                 showLegend = "true"
+                 legendNameColumn = "-1"
+                 autoRefresh = "false"> 
+							 
+							  <!-- Must specify the number of series, throws errors if the number is higher that sql statements below 
+							           limitted to just 8 series currently  -->
+
+						<SQL series1Sql = "select count(*), waveNo
+                                 from workorders
+                                  where waveNo != 0
+                                    and ts between '2017-01-01 00:00:00.000' and '2017-01-04 10:00:00'
+                                  group by waveNo"
+
+							series2Sql = "select count(*), waveNo
+                                   from workorders
+                                    where waveNo != 0
+                                      and ts between '2017-01-05 00:00:00.000' and '2017-01-06 00:00:00'
+                                    group by waveNo"/>
+
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>	
+			</SPLITPANE>
+		</SPLITPANE>	
+	</SPLITPANE>	
+</FLEXSCREEN>
+
+<!--queryDataColumn is an interger (first column is 1), 
+						the system will use this number to grab data from the sql column specified. 
+						(set to -1 if not needed, not needed if you are selecting table rows to populate graphs)-->
+
+<!--columnTagData is an interger (first column is 1),
+						(if dataColumn is set to -1 columnTagData must also be -1)
+						chart column names are selected from the sql column specified. (set to -1 if not needed)-->
+
+<!--totalRow is a boolean value, 
+                        set true if sql data has a 'total row' on the last row of data.
+						else leave it false-->
+						
+<!--target columns are only used if selecting data from a table.  these are the columns that will be selected.
+    <TARGET_COLUMNS>  
+	  <Column name = "Day" />
+	  <COLUMN name = "Loading" />
+	  <COLUMN name = "Idle" />
+	  <COLUMN name = "Prepared" />
+	  <COLUMN name = "Released" />
+	  <COLUMN name = "Picking" />
+	  <COLUMN name = "Complete" />
+	</TARGET_COLUMNS>-->	
+
+<!--Pie Chart required values, 
+                        <FLEXFXCHARTCOMPONENT name = "?">
+						<CHART type = "Pie" 
+							   key = "?" 
+							   chartTitle = "?"
+							   queryDataColumn = "?" 
+							   columnTagData = "?"> -->	
+
+<!--Bar Chart required values, 
+                        <FLEXFXCHARTCOMPONENT name = "?">
+						<CHART type = "bar" 
+							   key = "?" 
+							   chartTitle = "?"
+							   x-axisLabel = "?" 
+							   y-axisLabel = "?"
+							   queryDataColumn = "?" 
+							   columnTagData = "?"
+							   totalRow = "?"
+							   isHorizontal = "?"> -->	
+							   
+<!--Line Chart required values, 
+                        <FLEXFXCHARTCOMPONENT name = "?">
+						<CHART type = "Line" 
+							   key = "?" 
+							   chartTitle = "?"
+							   x-axisLabel = "?" 
+							   y-axisLabel = "?"
+							   queryDataColumn = "?" 
+							   columnTagData = "?"
+							   totalRow = "?"
+							   numberOfSeries = "?"> -->
+
+<!--Gauge required values, 
+                        <FLEXFXCHARTCOMPONENT name = "?">
+						<CHART type = "gauge"
+							       chartTitle = "?"
+								   unitType = "?" 
+								   skin = "?" "Modern, Dashboard, Flap, Quarter, Vertical, Slim, Linear, Digital, SimpleDigital, Default is Horizontal"
+								   maxValue = "?" 
+								   refreshRate = "?" in mills
+								   barColor = "?"> gauges have default colors, specify if you want to-->

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     menus.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: menus.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<menuTools>
+      <menu commandId = "tools" 
+            text = "Tools" 
+            accelerator = "T">
+        <menuitem commandId = "knowledgeBase" 
+                  text = "Knowledge Base"
+                  handler = "defaultScreen" />
+                  
+        <Include includeFlag = "0x001"
+                 filename = "$SCREEN_CONFIG_DIR/MenuTools/menuItemDbTools.xml"/>
+        
+        <menuitem commandId = "testScan" 
+                  text = "Test Scanner Mgr"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "message" 
+                  text = "Messenger"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "tcpipMessages"
+                  text = "Message Statistics"
+                  handler = "defaultScreen" />
+
+        <separator />
+        
+        <Include includeFlag = "0x001"
+                 filename = "$SCREEN_CONFIG_DIR/MenuTools/menuItemQcSpeak.xml"/>
+        
+        <menuitem commandId = "userSettings" 
+                  text = "User Settings"
+                  handler = "defaultScreen" 
+                  security = "false"/>
+      </menu>
+</menuTools>

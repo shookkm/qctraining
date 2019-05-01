@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     eventMgrEvents.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: eventMgrEvents.xml 9566 2017-09-06 17:08:37Z wlw $
+   - Notes:
+  -->
+<Events>
+  <!--
+     - Monitor WCS Disk C:, E:, AND F:
+    -->
+  <Event id = "WCS Disk C:" 
+         security = "true"
+         defaultStatus = "Disk ok">
+    <Status id = "Disk ok" 
+            compareValue = "10" 
+            compareType = "GREATER" 
+            compareBuffer = "5" />
+
+    <Status id = "Disk warning" 
+            icon = "diskUtilization.png" 
+            iconType = "standard" 
+            tooltip = "WCS Disk C: has %d%% free."
+            compareValue = "10" 
+            compareType = "LESS_EQUAL" 
+            compareBuffer = "5" />
+
+    <Status id = "Disk full" 
+            icon = "diskUtilization.png" 
+            iconType = "standard" 
+            tooltip = "WCS Disk C: has %d%% free."
+            refreshRate = "10"
+            compareValue = "5" 
+            compareType = "LESS_EQUAL" 
+            eventAction = "Products.EventMgr.StatusActions.SystemShutdown" 
+            preventStartup = "true" />
+  </Event>
+
+  <Event id = "WCS Disk D:" 
+         security = "true"
+         defaultStatus = "Disk ok">
+    <Status id = "Disk ok" 
+            compareValue = "6" 
+            compareType = "GREATER" 
+            compareBuffer = "3" />
+
+    <Status id = "Disk warning" 
+            icon = "diskUtilization.png" 
+            iconType = "standard" 
+            tooltip = "WCS Disk D: has %d%% free."
+            compareValue = "6" 
+            compareBuffer = "3"
+            compareType = "LESS_EQUAL" />
+
+    <Status id = "Disk full" 
+            icon = "diskUtilization.png" 
+            iconType = "standard" 
+            tooltip = "WCS Disk D: has %d%% free."
+            refreshRate = "10"
+            compareValue = "3" 
+            compareType = "LESS_EQUAL" 
+            eventAction = "Products.EventMgr.StatusActions.SystemShutdown" 
+            preventStartup = "true" />
+  </Event>
+
+  <!--
+     - These events should always be here.  It will monitor overall
+    -->
+  <Event id = "processStatus"
+         defaultStatus = "notOk" >
+    <Status id = "ok"
+            compareValue = "0"
+            compareType = "LESS_EQUAL" />
+    <Status id = "notOk"
+            icon = "gears.png"
+            iconType = "standard"
+            tooltip = "Processes not Ok. Double-click for more information."
+            screenAction = "displayProcesses"
+            compareValue = "0"
+            compareType = "GREATER" />
+  </Event>
+
+  <Event id = "noread"
+         defaultStatus = "ok">
+    <Status id = "ok"
+            compareValue = "4"
+            compareType = "LESS" 
+            compareBuffer = "2" />
+    <Status id = "notOk"
+            icon = "scannerEyeRed.gif"
+            iconType = "standard"
+            tooltip = "NOREAD rate exceeded on scanner %d."
+            screenAction = "scannerLog"
+            refreshRate = "10"
+            compareValue = "4"
+            compareType = "GREATER_EQUAL" />
+  </Event>
+
+  <Event id = "nodata"
+         defaultStatus = "ok">
+    <Status id = "ok"
+            compareValue = "4"
+            compareType = "LESS" 
+            compareBuffer = "2" />
+    <Status id = "notOk"
+            icon = "scannerEyeRed.gif"
+            iconType = "standard"
+            tooltip = "NODATA rate exceeded on scanner %d."
+            refreshRate = "10"
+            screenAction = "scannerLog"
+            compareValue = "4"
+            compareType = "GREATER_EQUAL" />
+  </Event>
+</Events>

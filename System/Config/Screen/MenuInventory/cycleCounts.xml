@@ -1,0 +1,478 @@
+<?xml version="1.0"?>
+<!--DOCTYPE FLEXSCREEN SYSTEM "flexscreen.dtd" -->
+<!--
+  - COPYRIGHT (c) 2007 Queen City Software, Inc. All Rights Reserved.
+  - No part of this copyrighted work may be reproduced, modified, or distributed
+  - in any form or by any means without the prior written permission of Queen
+  - City Software, Inc.
+ -
+ - $Id: cycleCounts.xml 9887 2018-03-07 18:58:07Z rlh $
+ - Notes:
+  -->
+
+<FLEXSCREEN title = "Cycle Count Status"
+            height = "500"
+            width = "950"
+            frametype = "internal"
+            updateSecurity = "cycleCountStatuses.edit"
+            insertSecurity = "cycleCountStatuses.edit"
+            deleteSecurity = "cycleCountStatuses.edit" >
+
+  <DBCONNECT type = "predefined"
+             connectionId = "default"
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "workOrderStatuses"
+               loadSql = "select idx, returnCodeMsg
+                          from MnemonicCodesView
+                          where mnemonicType = 'WORK_ORDER_STATUSES'
+                          order by idx" />
+
+    <VECTORMAP name = "workOrderStatusesByName"
+               loadSql = "select '' returnCodeMsg, 0 idx
+                          union
+                          select returnCodeMsg, idx
+                          from MnemonicCodesView
+                          where mnemonicType = 'WORK_ORDER_STATUSES'
+                            and returnCodeMsg in ('Cycle Count Planned', 'Cycle Count Started', 'Complete')
+                          order by idx" />
+
+    <VECTORMAP name = "workOrderLineStatuses"
+               loadSql = "select idx, returnCodeMsg
+                          from MnemonicCodesView
+                          where mnemonicType = 'WORK_ORDER_LINE_STATUSES'
+                          order by idx" />
+
+    <VECTORMAP name = "workOrderLineFlags"
+               loadSql = "select idx, returnCodeMsg
+                          from MnemonicCodesView
+                          where mnemonicType = 'WORK_ORDER_LINE_FLAGS'
+                          order by idx" />
+
+    <VECTOR name = "yesNoValues">
+      <ITEM value = "N" />
+      <ITEM value = "Y" />
+    </VECTOR>
+
+    <VECTOR name = "operators1">
+      <ITEM value = " =" />
+      <ITEM value = "like" />
+    </VECTOR>
+
+    <VECTOR name = "operators2">
+      <ITEM value = " =" />
+      <ITEM value = "&lt;&gt;" />
+    </VECTOR>
+
+    <VECTOR name = "operatorIn">
+      <ITEM value = "in" />
+      <ITEM value = "out" />
+    </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <TABPANE>
+    <TAB title = "Cycle Count Orders">
+      <SPLITPANE  divider = "125" orientation = "vertical" >
+
+        <FLEXSQLMODIFIERCOMPONENT  name = "CycleFilter"
+                                    appendAsAnd = "false"
+                                    makeAbsolute = "true"
+                                    autoResize = "false"
+                                    autoExecute = "true"
+                                    labelsOnTop = "false"
+                                    maxFilterRows = "3"
+                                    editorWidth = "150"
+                                    showCheckBoxes = "false"
+                                    filterBorderText = "Filter Criteria"
+                                    filterBorderColor = "blue"
+                                    okButtonText = "Execute"
+                                    passiveMode = "true"
+                                    orientation = "horizontal"
+                                    roundedCorners = "true" >
+
+          <DBCONNECT type = "global"
+                     connectionId = "default" />
+
+          <FILTER_OPTION label = "From Date"
+                         altValue = "fromDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+           <CALENDAR_OPTIONS  pastEnabled = "true"
+                              deselectEnabled = "true"
+                              monthsPast = "6"
+                              monthsFuture = "0"
+                              format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Cycle Count"
+                         altValue = "workOrder"
+                         editorType = "text"
+                         autoQuote = "true" >
+           </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Status"
+                         altValue = "status"
+                         editorType = "combo"
+                         autoQuote = "true" >
+
+            <COMBO_OPTIONS ifdef = "workOrderStatusesByName" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "To Date"
+                         altValue = "toDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true"
+                               deselectEnabled = "true"
+                               monthsPast = "6"
+                               monthsFuture = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "SKU"
+                         altValue = "sku"
+                         editorType = "text"
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Location"
+                         altValue = "location"
+                         editorType = "text"
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Tub"
+                         altValue = "tubId"
+                         editorType = "text"
+                         autoQuote = "true" >
+          </FILTER_OPTION>
+
+
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <SPLITPANE divider = "200"
+                   orientation = "horizontal" >
+          <FLEXLISTCOMPONENT name = "WorkList"
+                             greenbar = "true"
+                             log = "true">
+            <DBCONNECT type = "global" />
+
+           <!-- name of component being listened to -->
+           <TRIGGER name = "CycleFilter" />
+
+          <LIST key = "CycleFilter:execute"
+                title = "Work Orders"
+                icon = "workorder.gif"
+                color = "MEDIUM_GREEN" >
+
+            <SELECT sql = "Call CycleCountStatusScreen(//workOrder,
+                                                       //tubId,
+                                                       //sku,
+                                                       //location,
+                                                       //status,
+                                                       //fromDate,
+                                                       //toDate,
+                                                       1)" />
+          </LIST>
+
+          </FLEXLISTCOMPONENT>
+            <!--
+              - Work Order
+             -->
+            <TABPANE tabplacement = "top">
+
+              <!--
+                - ORDERS TAB
+               -->
+              <TAB  title = "Orders" >
+                <!-- every flex component has a name which is needed for referencing and attaching listeners-->
+                <FLEXTABLECOMPONENT name = "StatusTable"
+                                    greenbar = "true"
+                                    log = "true">
+                <DBCONNECT type = "global" />
+
+                <!-- name of component being listened to -->
+                <TRIGGER name = "WorkList" />
+
+
+                  <TABLE key = "WorkList" >
+                    <SELECT sql = "Select w.workOrderId Task,
+                                          w.status,
+                                          FlagDisplayer('WORK_ORDER_FLAGS',
+                                                        w.flags) flags,
+                                          w.receivedTs,
+                                          w.completeTs,
+                                          w.ts
+                                     from WorkOrders w
+                                    where w.workOrderId = //WorkList" />
+
+
+                    <UPDATE sql = "update workorders wo
+                                     join workorderlines wol
+                                     join workorderlineoperations wolo
+                                       on wol.workorderid = wolo.workorderid
+                                       and wol.lineno = wolo.lineno
+                                     set wo.status = //status,
+                                     wol.status = gWoLineComplete,
+                                     wolo.status = gWoLineComplete,
+                                     wo.completeTs = now(),
+                                     wol.completedTs = now()
+                                     where wo.workorderid = //WorkList
+                                     and wo.status &lt; gWoComplete
+                                     and wol.status &lt; gWoLineComplete
+                                     and wolo.status &lt; gWoLineComplete" />
+
+                    <DELETE sql = "Delete from WorkOrders where workorderid = //Task" />
+
+                    <ALTVALUES>
+                      <FIELD name = "status"
+                             ifdef = "workOrderStatuses" />
+                    </ALTVALUES>
+
+                    <EDITOR restoreHide = "true">
+
+                      <FIELD name = "status">
+                        <COMBO editable = "false" >
+                          <comboitem value = "Complete" />
+                        </COMBO>
+                      </FIELD>
+                    </EDITOR>
+                  </TABLE>
+                </FLEXTABLECOMPONENT>
+              </TAB>
+
+              <!--
+                - WORK ORDER LINES tab
+                -->
+              <TAB  title = "Lines">
+                <SPLITPANE divider = "200"
+                           orientation = "vertical" >
+                  <FLEXTABLECOMPONENT name = "LinesTableUpper"
+                                      greenbar = "true"
+                                      log = "true">
+                    <DBCONNECT type = "global" />
+                    <TRIGGER name = "WorkList" />
+
+                    <TABLE key = "WorkList" >
+                      <SELECT sql = "Select l.workOrderId Task,
+                                            l.LineNo,
+                                            l.Unit,
+                                            l.sourceLocationId location,
+                                            l.QtyRequired,
+                                            l.Status,
+                                            FlagDisplayer('WORK_ORDER_LINE_FLAGS',
+                                                          l.flags) flags,
+                                            dateformat(l.CompletedTs, gDateTimeFormat) CompletedTs,
+                                            dateformat(l.Ts, gDateTimeFormat) Ts
+                                       from WorkOrders w join
+                                            WorkOrderLines l
+                                      where l.workOrderId = //WorkList
+                                      order by Unit, LineNo"/>
+
+                   <!--   <UPDATE sql = "Update WorkOrderLines
+                                        set unit = //SKU,
+                                            qtyRequired = //qtyRequired,
+                                            status = //status
+                                      where workOrderId = //OrderId
+                                        and lineNo = //lineNo " /> -->
+
+                      <TABLECOLUMNS>
+                        <TABLECOLUMN name = "QtyRequired"
+                                     preferredWidth = "65"
+                                     maxWidth = "70"
+                                     align = "right"/>
+                        <TABLECOLUMN name = "LineNo"
+                                     preferredWidth = "45"
+                                     maxWidth = "50"
+                                     align = "right"/>
+                        <TABLECOLUMN name = "Qty"
+                                     preferredWidth = "45"
+                                     maxWidth = "50"
+                                     align = "right"/>
+                      </TABLECOLUMNS>
+
+                      <ALTVALUES>
+                        <FIELD name = "Status"
+                               ifdef = "workOrderLineStatuses" />
+                      </ALTVALUES>
+                    </TABLE>
+                  </FLEXTABLECOMPONENT>
+
+                  <!--
+                     - Lower Panel
+                    -->
+                  <FLEXTABLECOMPONENT name = "LinesTableLower"
+                                      greenbar = "true"
+                                      log = "true">
+                    <DBCONNECT type = "global" />
+                    <TRIGGER name = "LinesTableUpper" />
+
+                    <TABLE key = "LinesTableUpper:WorkList"
+                           title = "Line Item Details">
+                      <SELECT sql = "Select LineNo,
+                                            Idx,
+                                            Qty,
+                                            qtyCompleted QtyCounted,
+                                            LocationId,
+                                            ZoneId,
+                                            StorageId,
+                                            OperatorId,
+                                            Status,
+                                            FlagDisplayer('WORK_ORDER_LINE_FLAGS',
+                                                          flags) Flags,
+                                            dateformat(Ts, gDateTimeFormat) Ts
+                                      from workOrderLineOperations
+                                       where workOrderId = //Task
+                                         and lineNo = //LineNo
+                                       order by idx"/>
+
+                        <TABLECOLUMNS>
+                          <TABLECOLUMN name = "Idx"
+                                       preferredWidth = "45"
+                                       maxWidth = "50"
+                                       align = "right"/>
+                          <TABLECOLUMN name = "LineNo"
+                                       preferredWidth = "45"
+                                       maxWidth = "50"
+                                       align = "right"/>
+                          <TABLECOLUMN name = "Qty"
+                                       preferredWidth = "45"
+                                       maxWidth = "50"
+                                       align = "right"/>
+                          <TABLECOLUMN name = "QtyCounted"
+                                       preferredWidth = "70"
+                                       maxWidth = "75"
+                                       align = "right"/>
+                        </TABLECOLUMNS>
+
+                      <ALTVALUES>
+                        <FIELD name = "Flags"
+                               ifdef = "workOrderLineFlags" />
+                        <FIELD name = "Status"
+                               ifdef = "workOrderLineStatuses" />
+                      </ALTVALUES>
+                    </TABLE>
+                  </FLEXTABLECOMPONENT>
+                </SPLITPANE>
+              </TAB>
+
+           <!-- Discrepancies TAB -->
+
+              <TAB  title = "Discrepancies" >
+                <!-- every flex component has a name which is needed for referencing and attaching listeners-->
+                <FLEXTABLECOMPONENT name = "SummaryTable"
+                                    greenbar = "true"
+                                    log = "true"
+                                    records = "1000" >
+                  <DBCONNECT type = "global" />
+
+                  <!-- name of component being listened to -->
+                  <TRIGGER name = "WorkList" />
+
+                  <TABLE key = "WorkList" >
+                    <SELECT sql = "select wolo.locationId Location,
+                                          if(loc.flags &amp; 16 > 0) then 'Yes' else 'No' endif Discrepant,
+                                          sum(wolo.qty) Expected_Qty,
+                                          sum(wolo.qtyCompleted) Counted_Qty,
+                                          (Counted_Qty - Expected_Qty) Diff
+                                     from workorderlineoperations wolo
+                                     join locations loc on
+                                     wolo.locationId = loc.locationId
+                                     where wolo.workorderid = //WorkList
+                                     group by wolo.locationId, loc.flags
+                                     having Diff != 0
+                                     order by wolo.locationId" />
+
+                    <TABLECOLUMNS>
+                      <TABLECOLUMN name = "Expected_Qty"
+                                   align = "right"/>
+                      <TABLECOLUMN name = "Counted_Qty"
+                                   align = "right"/>
+                      <TABLECOLUMN name = "Diff"
+                                   align = "right"/>
+                    </TABLECOLUMNS>
+                  </TABLE>
+                </FLEXTABLECOMPONENT>
+              </TAB>
+           </TABPANE>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+
+    <TAB title = "Open C/C Stats">
+      <SPLITPANE divider = "150"
+                 orientation = "vertical">
+        <FLEXTABLECOMPONENT name = "CycleCountStatus"
+                            init = "init"
+                            greenbar = "true"
+                            refresh = "true"
+                            log = "true"
+                            records = "1000" >
+          <DBCONNECT type = "global" />
+
+          <!-- name of component being listened to -->
+          <TABLE key = "init" >
+            <SELECT sql = "select date(receivedTs) Day,
+                                  sum(if(status = gWoCyclePlanned) then 1 else 0 endif) Planned,
+                                  sum(if(status = gWoCycleStarted) then 1 else 0 endif) Started,
+                                  sum(if(status >= gWoComplete) then 1 else 0 endif) Complete,
+                                  if(Planned + Started = 0) then 'Done' endif Done
+                             from WorkOrders
+                             where workorderTYpe = 'cycleCount'
+                             group by Day
+                             order by day desc" />
+
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Planned"
+                           align = "right"/>
+              <TABLECOLUMN name = "Started"
+                           align = "right"/>
+              <TABLECOLUMN name = "Complete"
+                           align = "right"/>
+            </TABLECOLUMNS>
+          </TABLE>
+
+        </FLEXTABLECOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "CycleCountWo"
+                            greenbar = "true"
+                            log = "true"
+                            records = "1000" >
+          <DBCONNECT type = "global" />
+
+          <TRIGGER name = "CycleCountStatus" />
+
+          <!-- name of component being listened to -->
+          <TABLE key = "CycleCountStatus:init" >
+            <SELECT sql = "Select w.workOrderId Task,
+                                          w.Status,
+                                          count(l.lineNo) Lines,
+                                          dateformat(w.receivedTs, 'yyyy-mm-dd hh:mm') ReceivedTs,
+                                          dateformat(w.completeTs, 'yyyy-mm-dd hh:mm') CompleteTs,
+                                          dateformat(w.Ts, 'yyyy-mm-dd hh:mm') UpdateTs
+                                     from WorkOrders w
+                                     join WorkOrderLines l
+                                    where date(w.receivedTs) = //Day
+                                      and w.workOrderType = 'CycleCount'
+                                    group by w.workOrderId,
+                                             w.Status,
+                                             ReceivedTs,
+                                             CompleteTs,
+                                             UpdateTs
+                                    order by w.status" />
+
+            <ALTVALUES>
+              <FIELD name = "Status"
+                     ifdef = "workOrderStatuses" />
+            </ALTVALUES>
+            <TABLECOLUMNS>
+              <TABLECOLUMN name = "Lines"
+                           align = "right"/>
+            </TABLECOLUMNS>
+          </TABLE>
+
+        </FLEXTABLECOMPONENT>
+
+      </SPLITPANE>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

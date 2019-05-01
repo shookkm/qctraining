@@ -1,0 +1,315 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     demoDashboard.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: demoDashboard.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Demo Dashboard"
+            height = "600"
+            width = "1100"
+            frametype = "internal"
+            report = "false"
+            autoRefresh = "true"
+            refreshDelay = "600000">
+	<!-- a dbConnect here is a universal connect object  -->
+	<DBCONNECT type = "predefined" 
+               connectionId = "default" 
+               setglobal = "true"/>
+	<SPLITPANE divider = "550" 
+               orientation = "vertical">
+		<SPLITPANE divider = "850" 
+               orientation = "horizontal">
+			<PANEL name = "systemPanel"
+             preferredSize = "200, 200"
+             visible = "true"
+             layout = "grid, 1, 1">
+           
+        <FLEXFXCHARTCOMPONENT name = "filterChart"
+			  					            refresh = "true">
+					<DBCONNECT type = "global" />
+          
+					<COLORSERIES series = "#DB5929,#E5991F,#57AC57,#3F9CB8,#495DC2,#974AC1,#BC4362,#7D7D7D" />
+					<CHART type = "pie"
+                 title = "Open Replens"
+                 queryDataColumn = "1"
+                 columnTagData = "2"
+                 showLegend = "true"
+                 legendNameColumn = "2"
+                 legendPosition = "Right">
+            
+						<EDITORS name = "first"
+					 		       align = "left"
+								     btnPosition = "left">       
+							<EDITOR editorType = "calendar"
+								      editorTitle = "iFromDate"
+                      label="From Date"
+                      pastEnabled = "true"
+                      futureEnabled = "true"
+                      deselectEnabled = "true"
+                      monthsPast = "6" 
+                      monthsFuture = "2"
+                      dateFormat = "yyyy-MM-dd"/>
+							<EDITOR editorType = "text"
+                      label = "To Date"
+                      editorTitle = "iToDate"
+                      position = ""/>
+						</EDITORS>
+						<SQL sql = "select top(5) status,state from WorkOrders where workordertype=//iToDate and ts like '2017%'"/>       
+					</CHART>    
+				</FLEXFXCHARTCOMPONENT>
+           
+				<FLEXFXCHARTCOMPONENT name = "orderCounts">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#DB5929,#E5991F,#57AC57,#3F9CB8,#495DC2,#974AC1,#BC4362,#7D7D7D" />
+          
+					<CHART type = "pie" 
+                 key = "orderCounts" 
+                 title = "Boxed Order Counts" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "1"
+                 columnTagData = "2"
+                 showLegend = "true"
+                 legendNameColumn = "2"
+                 legendPosition = "Right"
+                 refresh = "true">
+						<EDITORS name = "first"
+                     align = "left"
+                     btnPosition = "left">       
+							<EDITOR editorType = "calendar"
+                      editorTitle = "iFromDate"
+                      label="From Date"
+                      pastEnabled = "true"
+                      futureEnabled = "true"
+                      deselectEnabled = "true"
+                      monthsPast = "6" 
+                      monthsFuture = "2"
+                      dateFormat = "yyyy-MM-dd"/>
+							<EDITOR editorType = "text"
+                      label = "To Date"
+                      editorTitle = "iToDate"
+                      position = ""/>
+              <EDITOR editorType = "combo"
+                  editorTitle = "textBox2"
+                  label = "Dummy Combo"
+                  comboSql = "select top 10(mnemonicCode) 
+                                from MnemonicCodes 
+                                order by length(mnemonicCode) desc"/>
+              </EDITORS>  
+              
+						<SQL sql = "call BoxedDashboardOrderCounts(//iFromDate,//textBox2,//iToDate);"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>
+			</PANEL>
+      
+			<PANEL name = "systemGaugePanel"
+             preferredSize = "200, 200"
+             visible = "true"
+             layout = "grid, 2, 2, 5, 5">
+        <FLEXFXCHARTCOMPONENT name = "ShippedToday">
+          <DBCONNECT type = "global" />
+          <CHART type = "gauge"
+                 title = "Shipped Today"
+                 unitType = "" 
+                 skin = "flat" 
+                 maxValue = ""
+                 barColor = "Green"
+                 refresh = "true">
+            <SQL sql = "select 1580"                    
+                 maxValue = "select 2000"/>
+          </CHART>	  
+        </FLEXFXCHARTCOMPONENT>
+					
+        <FLEXFXCHARTCOMPONENT name = "OrderWaiting">
+          <DBCONNECT type = "global" />
+          <CHART type = "gauge"
+                 title = "Orders Waiting"
+                 unitType = "To Start" 
+                 skin = "flat" 
+                 maxValue = ""
+                 barColor = "Red"
+                 refresh = "true">
+            <SQL sql = "select 52"
+                     
+               maxValue = "select count(distinct if status = gWoPrepared then workOrderId else null endif)
+                             from workOrders w
+                            where w.workOrderType = 'CLUSTER'"/>
+          </CHART>	  
+        </FLEXFXCHARTCOMPONENT>
+        
+				<MULTIPANEPANEL name = "openReplenPanel"
+                        visible = "true"
+                        height = "700" 
+                        width = "1200"
+                        layout = "flow"
+                        autoScroll = "false"
+                        buttonLocation = "right">
+				  <FLEXFXCHARTCOMPONENT name = "OpenReplens">
+            <DBCONNECT type = "global" />
+            
+            <CHART type = "gauge"
+                   title = "Total Open"
+                   unitType = "Replens" 
+                   skin = "flat" 
+                   maxValue = ""
+                   barColor = "Red"
+                   refresh = "true">
+              <SQL sql = "select count(distinct workorderid)
+                            from WorkOrders
+                            where workordertype = 'replen'
+                              and status &lt; gworeplencomplete"
+                        
+                 maxValue = "select count(distinct workorderid)
+                               from WorkOrders
+                               where workordertype = 'replen'
+                                 and status &lt; gworeplencomplete"/>
+            </CHART>	           
+				  </FLEXFXCHARTCOMPONENT>
+          
+				  <FLEXFXCHARTCOMPONENT name = "OpenReplens">
+            <DBCONNECT type = "global" />
+            
+            <CHART type = "gauge"
+                   title = "Priority"
+                   unitType = "Replens" 
+                   skin = "flat" 
+                   maxValue = ""
+                   barColor = "Red"
+                   refresh = "true">
+              <SQL sql = "select 12"
+                   maxValue = "select 12"/>
+            </CHART>	  
+				  </FLEXFXCHARTCOMPONENT>
+          
+				  <FLEXFXCHARTCOMPONENT name = "OpenReplens">
+            <DBCONNECT type = "global" />
+            <CHART type = "gauge"
+                             title = "Top Off"
+                             unitType = "Replens" 
+                             skin = "flat" 
+                             maxValue = ""
+                             barColor = "Red"
+                             refresh = "true">
+              <SQL sql = "select 21"
+                   maxValue = "select 21"/>
+            </CHART>	  
+				  </FLEXFXCHARTCOMPONENT>
+				</MULTIPANEPANEL>
+			</PANEL>			
+		</SPLITPANE>
+    
+		<PANEL name = "ZoneBarPanel"
+				   preferredSize = "200, 200"
+				   visible = "true"
+           layout = "grid, 1, 5">
+				<FLEXFXCHARTCOMPONENT name = "OpexBar">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#57AC57,#0D91DD,#DB5929,#3F9CB8" />
+					<CHART type = "bar"
+                 title = "Opex Picks Remaining" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "2"
+                 columnTagData = "1"
+                 showLegend = "false"
+                 refresh = "true">
+						<SQL series1Sql = "select 'OPEX1A' ZoneId, '20' Picks"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT> 
+
+        <FLEXFXCHARTCOMPONENT name = "PromoBar">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#57AC57,#0D91DD,#DB5929,#3F9CB8" />
+					<CHART type = "bar"
+                 title = "Promo Picks Remaining" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "2"
+                 columnTagData = "1"
+                 showLegend = "false"
+                 refresh = "true">
+						<SQL series1Sql = "select '1', '2'"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT> 
+
+        <FLEXFXCHARTCOMPONENT name = "PCBar">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#57AC57,#0D91DD,#DB5929,#3F9CB8" />
+					<CHART type = "bar"
+                 title = "Pallet Cluster Picks Remaining" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "2"
+                 columnTagData = "1"
+                 showLegend = "false"
+                 refresh = "true">
+						<SQL series1Sql = "with zones as
+                              (select '2' zoneId, '0' Picks
+                              union all
+                              select '3' zoneId, '6' Picks
+                              union all
+                              select '4' zoneId, '1' Picks
+                              union all
+                              select '5' zoneId, '0' Picks)
+                              select * from zones
+                              order by zoneId"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>         
+
+				<FLEXFXCHARTCOMPONENT name = "PFBar">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#57AC57,#0D91DD,#DB5929,#3F9CB8" />
+					<CHART type = "bar"
+                 title = "Pallet Flow Picks Remaining" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "2"
+                 columnTagData = "1"
+                 showLegend = "false"
+                 refresh = "true">
+						<SQL series1Sql = "with zones as
+                              (select '6' ZoneId, '14' Picks
+                              union all
+                              select '7' ZoneId, '0' Picks
+                              union all
+                              select '8' ZoneId, '3' Picks
+                              union all
+                              select '9' ZoneId, '0' Picks)
+                              select * from zones
+                              order by zoneId"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT> 
+
+        <FLEXFXCHARTCOMPONENT name = "CFBar">
+					<DBCONNECT type = "global" />
+					<COLORSERIES series = "#57AC57,#0D91DD,#DB5929,#3F9CB8" />
+					<CHART type = "bar"
+                 title = "Case Flow Picks Remaining" 
+                 x-axisLabel = "" 
+                 y-axisLabel = ""
+                 queryDataColumn = "2"
+                 columnTagData = "1"
+                 showLegend = "false"
+                 refresh = "true">
+						<SQL series1Sql = "with zones as
+                              (select '10' ZoneId, '10' Picks
+                              union all
+                              select '11' ZoneId, '4' Picks
+                              union all
+                              select '12' ZoneId, '14' Picks
+                              union all
+                              select '13' ZoneId, '10' Picks)
+                              select * from zones
+                              order by zoneId"/>
+					</CHART>	  
+				</FLEXFXCHARTCOMPONENT>     
+			</PANEL>
+	</SPLITPANE>
+</FLEXSCREEN> 

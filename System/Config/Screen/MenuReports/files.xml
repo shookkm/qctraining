@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     files.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: files.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<reportsMenuFiles>
+      <Screen commandId = "skuReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/skuReports.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "agedSkuReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/agedSkuReport.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "productivityReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/productivityReport.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "fillRate"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/fillRate.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "activityLog"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/activityLog.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+      
+
+  	  <Screen commandId = "locationStatistics"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/locationStatistics.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "unitSlotClassReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/unitSlotClassReport.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "openPicksReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "MenuReports/openPicks.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+</reportsMenuFiles>

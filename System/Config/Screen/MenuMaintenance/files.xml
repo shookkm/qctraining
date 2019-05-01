@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     files.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: files.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<maintenanceMenuFiles>
+      <Screen commandId = "locationMaintenance"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "menuMaintenance/locationMaintenance.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "pickSlotting"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "menuMaintenance/pickSlotting.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "totalInventoryReport"
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "menuMaintenance/totalInventoryReport.xml" />
+          <param name = "xmlSource"
+                 value = "project" />
+        </Params>
+      </Screen>
+      
+      <Screen commandId = "atopMaintenance" 
+              count = "1"
+              screenClass = "com.qcsoftware.ui.core.FrmWebBrowser">
+        <Params>
+          <param name = "defaultUrl" 
+                 value = "http://192.168.208.80:8080/ATOP" />
+          <param name = "navigationEnabled" 
+                 value = "false" />
+          <param name = "title" 
+                 value = "ATOP Maintenance" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "atopLightInquiry" 
+              count = "1"
+              screenClass = "com.qcsoftware.products.atopmgr.ui.FrmATOPLightInquiry">
+        <Params>
+          <param name = "title" 
+                 value = "ATOP Light Inquiry" />
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "opexTaskMaintenance" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName"
+                 value = "menuMaintenance/opexTaskMaintenance.xml" />
+          <param name = "xmlSource" 
+                 value = "project" />
+        </Params>
+      </Screen>
+
+     <Screen commandId = "opexTubMaintenance" 
+             count = "1"
+             screenClass = "com.qcsoftware.ui.matrixcontainer.FrmTestToteMatrixDisplay">
+        <Params>
+          <param name = "title" 
+                 value = "OPEX Tub Maintenance" />
+          <param name = "connectionId" 
+                 value = "default" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "opexEmptyTubs" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName" 
+                 value = "menuMaintenance/opexEmptyTubs.xml" />
+          <param name = "xmlSource" 
+                 value = "project" />
+        </Params>
+      </Screen>
+
+      <Screen commandId = "opexTubsWithSameSKU" 
+              count = "1"
+              screenClass = "Gui.FlexScreen.FleXmlScreen">
+        <Params>
+          <param name = "xmlFileName" 
+                 value = "menuMaintenance/opexTubsWithSameSKU.xml" />
+          <param name = "xmlSource" 
+                 value = "project" />
+        </Params>
+      </Screen>
+</maintenanceMenuFiles>

@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<!--DOCTYPE FLEXSCREEN SYSTEM "flexscreen.dtd" -->
+<!--############################################################################
+  #        File: orderCounts.xml
+  # Description: Order Counts flex screen.
+  #
+  # COPYRIGHT (C) 2017 Queen City Software, Inc. All Rights Reserved.
+  # No part of this copyrighted work may be reproduced, modified, or distributed
+  # in any form or by any means without the prior written permission of
+  # Queen City Software, Inc.
+  #
+  # $Id: replenReports.xml 9887 2018-03-07 18:58:07Z rlh $
+  #
+  # Notes:
+  #
+  ###########################################################################-->
+
+<FLEXSCREEN title = "Replen Report"
+            height = "650"
+            width = "1100"
+            frametype = "internal"
+            report = "false"
+            updateSecurity = "replenReport.edit"
+            insertSecurity = "replenReport.edit"
+            deleteSecurity = "replenReport.edit" >
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined"
+             connectionId = "default"
+             setglobal = "true"/>
+
+  <INIT_ACTIONS>
+  </INIT_ACTIONS>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTOR name = "zoneList"
+                loadSql = "select '' zoneId
+                           union
+                           select distinct zoneId
+                             from locationZones
+                            where masterZoneId in('PTL', 'OPEX')
+                            order by zoneId" />
+
+    <VECTORMAP name = "typeListIn">
+      <ITEM key = "" value = "" />
+      <ITEM key = "Priority" value = "30" />
+      <ITEM key = "Topoff" value = "50" />
+    </VECTORMAP>
+
+    <VECTORMAP name = "typeListOut">
+      <ITEM key = "30" value = "Priority" />
+      <ITEM key = "50" value = "Topoff" />
+    </VECTORMAP>
+
+    <VECTOR name = "yesNoValues">
+      <ITEM value = "TRUE" />
+      <ITEM value = "FALSE" />
+   </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <REPORTS preview = "true"
+           records = "1000">
+    <DBCONNECT type = "global" />
+  </REPORTS>
+
+  <TABPANE>
+    <TAB title = "System Replen">
+		  <SPLITPANE  divider = "80"
+		              orientation = "vertical">
+		    <FLEXSQLMODIFIERCOMPONENT  name = "replenFilter"
+		                               orientation = "horizontal"
+		                               appendAsAnd = "false"
+		                               makeAbsolute = "false"
+		                               autoResize = "false"
+		                               autoExecute = "true"
+		                               maxFilterRows = "1"
+		                               editorWidth = "120"
+		                               showCheckBoxes = "false"
+		                               filterBorderText = "Filter Criteria"
+		                               filterBorderColor = "blue"
+		                               okButtonText = "Execute"
+		                               passiveMode = "false">
+		
+		      <DBCONNECT type = "global"/>
+		
+		      <FILTER_OPTION label = "Zone"
+		                     altValue = "zoneId"
+		                     editorType = "combo"
+		                     autoQuote = "true">
+		         <COMBO_OPTIONS ifdef = "zoneList" />
+		      </FILTER_OPTION>
+		
+		      <FILTER_OPTION label = "Location"
+		                     altValue = "locationId"
+		                     editorType = "text"
+		                     autoQuote = "true" />
+		
+		      <FILTER_OPTION label = "Unit"
+		                     altValue = "unit"
+		                     editorType = "text"
+		                     autoQuote = "true" />
+		
+		      <FILTER_OPTION label = "Type"
+		                     altValue = "typeIn"
+		                     editorType = "combo"
+		                     autoQuote = "true">
+		         <COMBO_OPTIONS ifdef = "typeListIn" />
+		      </FILTER_OPTION>
+		    </FLEXSQLMODIFIERCOMPONENT>
+		
+		     <FLEXTABLECOMPONENT name = "replensTable"
+		                        init = "init"
+		                        refresh = "true"
+		                        greenbar = "true"
+		                        sortable = "true"
+		                        records = "1000"
+		                        ignoreEventConcatenation = "true">
+		
+		      <DBCONNECT type = "global" />
+		      <TRIGGER name = "replenFilter" />
+		
+		      <TABLE key = "replenFilter:execute" >
+		
+		        <SELECT sql = "call ReplenReport(//zoneId,
+                                             //locationId,
+                                             //unit,
+                                             //typeIn)" />
+		
+		        <ALTVALUES>
+		          <FIELD name = "Type"
+		                 ifdef = "typeListOut" />
+		        </ALTVALUES>
+		
+		        <TABLECOLUMNS>
+		          <TABLECOLUMN name = "LocationId"
+		                       preferredWidth = "90"
+		                       maxWidth = "90"/>
+		          <TABLECOLUMN name = "ZoneId"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"/>
+		          <TABLECOLUMN name = "DropOffLocation"
+		                       preferredWidth = "100"
+		                       maxWidth = "100"/>
+		          <TABLECOLUMN name = "Unit"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"/>
+		          <TABLECOLUMN name = "MinQty"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"
+		                       align = "right" />
+		          <TABLECOLUMN name = "MaxQty"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"
+		                       align = "right" />
+		          <TABLECOLUMN name = "ReserveQty"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"
+		                       align = "right" />
+		          <TABLECOLUMN name = "BackstockQty"
+		                       preferredWidth = "90"
+		                       maxWidth = "90"
+		                       align = "right" />
+		          <TABLECOLUMN name = "ReplenQty"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"
+		                       align = "right" />
+		          <TABLECOLUMN name = "Type"
+		                       preferredWidth = "80"
+		                       maxWidth = "90"/>
+		        </TABLECOLUMNS>
+		
+		        <ALTVALUES>
+		        </ALTVALUES>
+		      </TABLE>
+		    </FLEXTABLECOMPONENT>
+		  </SPLITPANE>
+    </TAB>
+     
+    <TAB title = "OPEX">
+      <SPLITPANE  divider = "80" 
+                  orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "opexFilterV2"
+                                   orientation = "horizontal"
+                                   appendAsAnd = "false"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "1"
+                                   editorWidth = "70"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "false">
+
+          <DBCONNECT type = "global"/>    
+          
+          <FILTER_OPTION label = "Unit" 
+                         altValue = "unit" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Future Days (14)" 
+                         altValue = "futureDays" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Qty Multiplier (2)" 
+                         altValue = "qtyReqMultiple" 
+                         editorType = "text" 
+                         autoQuote = "true" />
+                         
+          <FILTER_OPTION label = "Reserve Qty > 0" 
+                         altValue = "reserveQtyGtrZero" 
+                         editorType = "combo" 
+                         autoQuote = "true">
+             <COMBO_OPTIONS ifdef = "yesNoValues" />              
+          </FILTER_OPTION>
+          
+        </FLEXSQLMODIFIERCOMPONENT>
+            
+        <SPLITPANE  divider = "300" 
+                    orientation = "vertical">
+          <FLEXTABLECOMPONENT name = "opexTableV2" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+                              sortable = "true"
+                              records = "1000"
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "opexFilterV2" />
+
+            <TABLE key = "opexFilterV2:execute" >
+              <SELECT sql = "call ReplenOpexV2(//unit,
+                                               //futureDays,
+                                               //qtyReqMultiple,
+                                               //reserveQtyGtrZero)"/>
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Unit"
+                             preferredWidth = "80"
+                             maxWidth = "90"/>
+                <TABLECOLUMN name = "UnitType"
+                             preferredWidth = "80"
+                             maxWidth = "90"/>
+                <TABLECOLUMN name = "QtyRequired"
+                             preferredWidth = "80"
+                             maxWidth = "90"
+                             align = "right" />
+                <TABLECOLUMN name = "QtyReqMultiple"
+                             preferredWidth = "80"
+                             maxWidth = "90"
+                             align = "right" />
+                <TABLECOLUMN name = "ReplenQty"
+                             preferredWidth = "80"
+                             maxWidth = "90"
+                             align = "right" />
+                <TABLECOLUMN name = "OpexQty"
+                             preferredWidth = "80"
+                             maxWidth = "90"
+                             align = "right" />
+                <TABLECOLUMN name = "ReserveQty"
+                             preferredWidth = "80"
+                             maxWidth = "90"
+                             align = "right" />
+              </TABLECOLUMNS>
+              
+              <ALTVALUES>
+              </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name = "unitLocationTableV2" 
+                              init = "init" 
+                              refresh = "true" 
+                              greenbar = "true"
+                              sortable = "true"
+                              records = "1000"
+                              ignoreEventConcatenation = "true">
+
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "opexTableV2" />
+
+            <TABLE key = "opexTableV2:opexFilterV2:execute" >
+              <SELECT sql = "select l.ZoneId,
+                                    l.LocationId,
+                                    sum(i.qty) Qty
+                               from LocationZones lz
+                               join Locations l
+                               join Storage s
+                               join Inventory i
+                               where unit = //Unit
+                                 and unitType = gEach
+                                 and (l.zoneId = 'REPLEN.OPEX.1B' or
+                                     lz.masterZoneId = 'reserve')
+                               group by l.ZoneId,
+                                        l.LocationId
+                               order by l.ZoneId,
+                                        l.LocationId"/>
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Qty"
+                             align = "right" />
+              </TABLECOLUMNS>
+              
+              <ALTVALUES>
+              </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

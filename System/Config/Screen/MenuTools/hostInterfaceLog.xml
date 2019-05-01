@@ -1,0 +1,336 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     hostInterfaceLog.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: hostInterfaceLog.xml 10150 2018-05-08 12:08:53Z rlh $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Host Interface Log" height = "460" width = "1000"
+            frametype = "internal"
+            globalThreading = "true">
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "default" setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "logStatuses"
+               loadSql = "select idx, returnCodeMsg
+                            from mnemonicCodesView
+                           where mnemonicType = 'TRANSACTION_LOG_STATUSES'"/>
+
+    <VECTORMAP name = "historyLogSearchableStatuses"
+               loadSql = "select returnCodeMsg, mnemonicCode
+                            from MnemonicCodesView
+                           where mnemonicType = 'TRANSACTION_LOG_STATUSES'
+                             and mnemonicCode in ('TX_COMPLETE',
+                                                  'TX_FAILED',
+                                                  'RX_RECEIVED',
+                                                  'RX_PROCESS_FAILED')
+                           order by returnCodeMsg" />
+
+    <VECTORMAP name = "activeLogSearchableStatuses"
+               loadSql = "select returnCodeMsg, mnemonicCode
+                            from MnemonicCodesView
+                           where mnemonicType = 'TRANSACTION_LOG_STATUSES'
+                             and mnemonicCode in ('WAITING_TX',
+                                                  'TRANSMITTED',
+                                                  'RX_RECEIVED')
+                           order by returnCodeMsg" />
+
+    <VECTOR name = "sourceFilter">
+      <ITEM value = "SET VALUES"/>
+    </VECTOR>
+
+    <VECTOR name = "msgTypeFilter">
+      <ITEM value = "SET VALUES"/>
+    </VECTOR>
+  </GLOBAL_DEFINITIONS>
+
+  <BORDER_COMPONENT orientation = "south" >
+    <ACTIVITY_PANEL labelColor = "red" messageColor = "blue" >
+      <SOURCE sourceName = "HistoryTable" /> 
+      <SOURCE sourceName = "ActiveTable" /> 
+    </ACTIVITY_PANEL>
+  </BORDER_COMPONENT>
+
+  <TABPANE tabplacement = "top">
+    <!-- HISTORY TAB-->
+    <TAB title = "History" >
+      <SPLITPANE orientation = "vertical" divider = "90">
+        <FLEXSQLMODIFIERCOMPONENT  name = "HistorySqlFilter"
+                                   orientation = "horizontal" 
+                                   appendAsAnd = "true"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "2"
+                                   editorWidth = "120"
+                                   titleColor = "MEDIUM_GREEN"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue" 
+                                   passiveMode = "false"
+                                   orderBorderText = "Order By"
+                                   orderBorderColor = "blue"
+                                   reorderButtonText = "ReOrder" >
+
+          <DBCONNECT type = "global"/>
+          <!-- filterOperators hash1 -->
+          <FILTER_OPTION label = "MsgSource"
+                         altValue = "MsgSource"
+                         editorType = "combo" autoQuote = "true" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "sourceFilter"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "MsgType"
+                         altValue = "MsgType"
+                         editorType = "combo" autoQuote = "true" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "msgTypeFilter"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Status"
+                         altValue = "Status"
+                         editorType = "combo" autoQuote = "true" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "historyLogSearchableStatuses"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Msg"  altValue = "Msg"
+                         editorType = "text" autoQuote = "true" />
+
+          <ORDER_OPTION  label = "OrderBy" editorType = "combo">
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "Ts Descending"
+                            altValue = "sendReceiveTs desc" />
+              <COMBO_OPTION value = "Ts Ascending"
+                            altValue =  "sendReceiveTs asc" />
+            </COMBO_OPTIONS>
+          </ORDER_OPTION>
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <SPLITPANE orientation = "vertical" divider = "215">
+          <FLEXTABLECOMPONENT name = "HistoryTable"
+                              greenbar = "true" refresh = "true"
+                              ignoreEventConcatenation = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "HistorySqlFilter" />
+            <TRIGGER name = "ResendPanel" />
+
+            <TABLE key = "HistorySqlFilter:execute">
+              <SELECT sql = "Call HostInterfaceLogScreenHistoryEx(//MsgSource,
+                                                                  //MsgType,
+                                                                  //Status,
+                                                                  //Msg,
+                                                                  //OrderBy,
+                                                                  'hostInterface')"/>
+              <UPDATE sql = "update transactionLogHistory
+                                set MsgBytes = //Msg
+                              where AppName = 'hostInterface'
+                                and MsgNo = //MsgNo
+                                and dateformat(sendReceiveTs, 'yyyy-mm-dd hh:nn:ss.sss') = //Ts"/>
+
+              <ALTVALUES>
+                <FIELD name = "Status" ifdef = "logStatuses" />
+              </ALTVALUES>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name           = "MsgSource"
+                             preferredWidth = "50"
+                             minWidth       = "50" />
+                <TABLECOLUMN name           = "PortNo"
+                             align          = "right"
+                             preferredWidth = "40"
+                             maxWidth       = "60"
+                             minWidth       = "40" />
+                <TABLECOLUMN name           = "MsgType"
+                             preferredWidth = "40"
+                             minWidth       = "40" />
+                <TABLECOLUMN name           = "MsgNo"
+                             align          = "right"
+                             preferredWidth = "50"
+                             minWidth       = "50" />
+                <TABLECOLUMN name           = "NumberOfTimesSent"
+                             align          = "right"
+                             preferredWidth = "50"
+                             maxWidth       = "50"
+                             minWidth       = "20" />
+                <TABLECOLUMN name           = "Msg"
+                             preferredWidth = "500" />
+                <TABLECOLUMN name           = "Status"
+                             preferredWidth = "60"
+                             minWidth       = "60" />
+                <TABLECOLUMN name           = "Ts"
+                             preferredWidth = "80"
+                             maxWidth       = "150"
+                             minWidth       = "80" />
+              </TABLECOLUMNS>          
+
+              <EDITOR restoreHide = "true" title = "Message Editor"
+                      minEditorWidth = "700">
+                <FIELD name = "Msg">
+                  <TEXTFIELD fieldsize = "250" cutpaste = "true" />
+                </FIELD>
+              </EDITOR>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+
+          <FLEXBUTTONPANEL name="ResendPanel" rows = "1" columns="1"
+                           pad="3" verticalBorder="10" horizontalBorder="100"
+                           autoCommit = "true" handleResult = "true"
+                           messageMode = "popup" 
+                           enableWarning = "true"
+                           parentRequired = "true">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "HistoryTable" />
+            <BUTTON name = "dummy1" text = ""   visible = "false" />
+            <BUTTON name = "Reprocess" text = "BtnReprocess"
+                    securityId = "hostInterfaceLog.reprocess"
+                    foreground = "blue"
+                    action = "refresh">
+              <SQL_COMMAND sqlType="returnErrMsg"
+                           sql="Call TransLogHistoryResendMsgEx('hostInterface', //MsgNo, //Ts)"
+                           successMessage="SuccessfullyQueued"/>
+            </BUTTON>
+            <BUTTON name = "dummy2" text = "" visible = "false"  />
+          </FLEXBUTTONPANEL>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+    <!-- ACTIVE MESSAGES TAB-->
+    <TAB title = "Active" >
+      <SPLITPANE orientation = "vertical" divider = "90">
+        <FLEXSQLMODIFIERCOMPONENT  name = "ActiveSqlFilter" 
+                                   orientation = "horizontal" 
+                                   appendAsAnd = "true"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   maxFilterRows = "2"
+                                   editorWidth = "120"
+                                   titleColor = "MEDIUM_GREEN"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue" 
+                                   orderBorderText = "Order By"
+                                   passiveMode = "false"
+                                   orderBorderColor = "blue"
+                                   reorderButtonText = "ReOrder" >
+          <DBCONNECT type = "global"/>
+          <!-- filterOperators hash1 -->
+          <FILTER_OPTION label = "MsgSource"
+                         altValue = "MsgSource"
+                         editorType = "combo" autoQuote = "true" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "sourceFilter"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "MsgType"
+                         altValue = "MsgType"
+                         editorType = "combo" autoQuote = "true" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "msgTypeFilter"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Status"
+                         altValue = "Status"
+                         editorType = "combo" autoQuote = "false" >
+            <COMBO_OPTIONS loadEmptyItem = "true"
+                           ifdef = "activeLogSearchableStatuses"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "Msg"  altValue = "Msg"
+                         editorType = "text" autoQuote = "true" />
+
+          <ORDER_OPTION  label = "OrderBy" editorType = "combo">
+            <COMBO_OPTIONS>
+              <COMBO_OPTION value = "Ts Descending"
+                            altValue = "sendReceiveTs desc" />
+              <COMBO_OPTION value = "Ts Ascending"
+                            altValue =  "sendReceiveTs asc" />
+            </COMBO_OPTIONS>
+          </ORDER_OPTION>
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <SPLITPANE orientation = "vertical" divider = "215">
+          <FLEXTABLECOMPONENT name = "ActiveTable"
+                              greenbar = "true" refresh = "true"
+                              ignoreEventConcatenation = "true">
+            <DBCONNECT type = "global"/>
+            <TRIGGER name = "ActiveSqlFilter" />
+            <TRIGGER name = "FailedPanel" />
+
+            <TABLE key = "ActiveSqlFilter:execute">
+              <SELECT sql = "call HostInterfaceLogScreenActiveEx(//MsgSource,
+                                                                 //MsgType,
+                                                                 //Status,
+                                                                 //Msg,
+                                                                 //OrderBy,
+                                                                 'hostInterface')"/>
+              <ALTVALUES>
+                <FIELD name = "Status" ifdef = "logStatuses" />
+              </ALTVALUES>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name           = "MsgSource"
+                             preferredWidth = "50"
+                             minWidth       = "50" />
+                <TABLECOLUMN name           = "PortNo"
+                             align          = "right"
+                             preferredWidth = "40"
+                             maxWidth       = "60"
+                             minWidth       = "40" />
+                <TABLECOLUMN name           = "MsgType"
+                             preferredWidth = "40"
+                             minWidth       = "40" />
+                <TABLECOLUMN name           = "MsgNo"
+                             align          = "right"
+                             preferredWidth = "50"
+                             minWidth       = "50" />
+                <TABLECOLUMN name           = "NumberOfTimesSent"
+                             align          = "right"
+                             preferredWidth = "50"
+                             maxWidth       = "50"
+                             minWidth       = "20" />
+                <TABLECOLUMN name           = "Msg"
+                             preferredWidth = "500" />
+                <TABLECOLUMN name           = "Status"
+                             preferredWidth = "60"
+                             minWidth       = "60" />
+                <TABLECOLUMN name           = "Ts"
+                             preferredWidth = "80"
+                             maxWidth       = "150"
+                             minWidth       = "80" />
+              </TABLECOLUMNS>          
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+
+          <FLEXBUTTONPANEL name="FailedPanel" rows = "1" columns="1"
+                           pad="3" verticalBorder="10" horizontalBorder="100"
+                           autoCommit = "true" handleResult = "true"
+                           messageMode = "popup" 
+                           parentRequired = "true">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ActiveTable" />
+            <BUTTON name = "dummy1" text = ""   visible = "false" />
+            <BUTTON name = "Failed"
+                    text = "BtnFailed"
+                    foreground = "blue"
+                    securityId = "hostInterfaceLog.fail"
+                    action = "refresh">
+              <FLEXACTION class = "com.qcsoftware.ui.hostinterfacelog.HostLogFailAction"
+                          hostInterface = "hostInterface" />
+            </BUTTON>
+            <BUTTON name = "dummy2" text = "" visible = "false"  />
+          </FLEXBUTTONPANEL>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB> 
+  </TABPANE>
+</FLEXSCREEN>

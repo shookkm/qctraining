@@ -1,0 +1,567 @@
+<?xml version="1.0"?>
+<!--DOCTYPE FLEXSCREEN SYSTEM "flexscreen.dtd" -->
+<!--
+  - COPYRIGHT (c) 2017 Queen City Software, Inc. All Rights Reserved.
+  - No part of this copyrighted work may be reproduced, modified, or distributed
+  - in any form or by any means without the prior written permission of Queen
+  - City Software, Inc.
+  -
+  - $Id: asnWorkOrders.xml 9911 2018-03-15 14:20:24Z rlh $
+  -->
+
+<FLEXSCREEN title = "POs"
+            height = "600"
+            width = "950"
+            frametype = "internal"
+            globalThreading = "true"
+            updateSecurity = "asnOrderStatuses.edit"
+            insertSecurity = "asnOrderStatuses.edit"
+            deleteSecurity = "asnOrderStatuses.edit" >
+
+  <DBCONNECT type = "predefined"
+             connectionId = "default"
+             setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "workOrderStatusesByName"
+               loadSql = "select returnCodeMsg, idx
+                            from MnemonicCodesView
+                            where mnemonicType = 'ASN_WO_STATUSES'
+                              and returnCodeMsg in ('Loaded', 'Receiving', 'Received', 'Complete', 'Cancelled')
+                            order by idx" />
+
+    <VECTORMAP name = "workOrderStates"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'WORK_ORDER_STATES'
+                            order by idx" />
+
+    <VECTORMAP name = "orderStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'ASN_WO_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "inventoryStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'INVENTORY_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "inventoryFlags"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'INVENTORY_FLAGS'
+                            order by idx" />
+
+    <VECTORMAP name = "inventoryAllocatedStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'INVENTORY_ALLOCATION_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "moveableUnitCLusterStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'MOVEABLE_UNIT_CLUSTER_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "moveableUnitCLusterFlags"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'MOVEABLE_UNIT_CLUSTER_flags'
+                            order by idx" />
+
+    <VECTORMAP name = "storageStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'STORAGE_STATUSES'
+                            order by idx ">
+
+      <ITEM key = "327680" value = "Label Re-Printed" />
+
+    </VECTORMAP>
+
+    <VECTORMAP name = "workOrderFlags"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                             from MnemonicCodesView
+                             where mnemonicType = 'ASN_WO_FLAGS'
+                             order by idx" />
+
+    <VECTORMAP name = "workOrderStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'ASN_WO_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "workOrderLineStatuses"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'ASN_WO_LINE_STATUSES'
+                            order by idx" />
+
+    <VECTORMAP name = "workOrderLineFlags"
+               loadSql = "select idx,
+                                 returnCodeMsg
+                            from MnemonicCodesView
+                            where mnemonicType = 'ASN_WO_LINE_FLAGS'
+                            order by idx" />
+
+    <VECTORMAP name    = "workOrderLineFlags"
+               loadSql = "SELECT returnCodeMsg, idx
+                            FROM MnemonicCodesView
+                           WHERE mnemonicType = 'ASN_WO_LINE_FLAGS'
+                           ORDER BY idx" />
+
+    <VECTOR    name    = "woLineStatuses"
+               loadSql = "SELECT returnCodeMsg
+                            FROM MnemonicCodesView
+                           WHERE mnemonicType = 'ASN_WO_LINE_STATUSES'
+                           ORDER BY idx" />
+
+    <VECTOR name = "yesNoValues">
+      <ITEM value = "N" />
+      <ITEM value = "Y" />
+    </VECTOR>
+
+    <VECTORMAP name = "orderBys">
+      <ITEM key = "WorkOrder Asc" value = "order by w.workorderId asc" />
+      <ITEM key = "WorkOrder Desc" value = "order by w.workorderId desc" />
+      <ITEM key = "Received Time Asc" value = "order by w.receivedTs desc" />
+      <ITEM key = "Received Time Desc" value = "order by w.receivedTs desc" />
+    </VECTORMAP>
+
+    <VECTORMAP name = "workOrderTypes">
+      <ITEM key = "" value = "" />
+      <ITEM key = "Batch" value = "BATCH" />
+      <ITEM key = "Cluster" value = "CLUSTER" />
+    </VECTORMAP>
+
+    <VECTORMAP name = "companyTypes">
+      <ITEM key = "" value = "" />
+      <ITEM key = "C&amp;B" value = "100" />
+      <ITEM key = "LON" value = "200" />
+    </VECTORMAP>
+
+    <VECTOR name = "operators1">
+      <ITEM value = " =" />
+      <ITEM value = "like" />
+    </VECTOR>
+
+    <VECTOR name = "operators2">
+      <ITEM value = " =" />
+      <ITEM value = "&lt;&gt;" />
+    </VECTOR>
+
+    <VECTOR name = "operatorIn">
+      <ITEM value = "in" />
+      <ITEM value = "out" />
+    </VECTOR>
+
+    <VECTORMAP name = "zoneIds"
+               loadSql = "select zoneId, zoneId
+                            from LocationZones
+                           where masterZoneId like 'Area_'
+                           union
+                          select '', ''
+                            from Dummy
+                           order by zoneId" />
+  </GLOBAL_DEFINITIONS>
+
+  <BORDER_COMPONENT orientation = "south" >
+
+    <ACTIVITY_PANEL labelColor = "red" messageColor = "blue" >
+
+      <SOURCE sourceName = "POs" />
+      <SOURCE sourceName = "StatusTable" />
+     </ACTIVITY_PANEL>
+  </BORDER_COMPONENT>
+
+  <SPLITPANE  divider = "80"
+              orientation = "vertical" >
+
+    <FLEXSQLMODIFIERCOMPONENT  name = "OrderFilter"
+                               appendAsAnd = "false"
+                               makeAbsolute = "true"
+                               autoResize = "false"
+                               autoExecute = "true"
+                               labelsOnTop = "false"
+                               maxFilterRows = "2"
+                               editorWidth = "130"
+                               showCheckBoxes = "false"
+                               filterBorderText = "Filter Criteria"
+                               filterBorderColor = "blue"
+                               okButtonText = "Execute"
+                               passiveMode = "true"
+                               orientation = "horizontal"
+                               roundedCorners = "true" >
+
+      <DBCONNECT type = "global" connectionId = "default" />
+
+     <FILTER_OPTION label = "Received Date"
+                     altValue = "receivedDate"
+                     editorType = "calendar"
+                     autoQuote = "true" >
+        <CALENDAR_OPTIONS  pastEnabled = "true"
+                           deselectEnabled = "true"
+                           monthsPast = "6"
+                           monthsFuture = "2"
+                           format = "yyyy-MM-dd"/>
+
+      </FILTER_OPTION>
+
+      <FILTER_OPTION label = "PO"
+                     altValue = "po"
+                     editorType = "text"
+                     autoQuote  = "true" />
+
+      <FILTER_OPTION label = "Status"
+                     altValue = "status"
+                     editorType = "combo"
+                     autoQuote = "true" >
+
+        <COMBO_OPTIONS ifdef = "workOrderStatusesByName" loadEmptyItem = "true"/>
+      </FILTER_OPTION>
+      <FILTER_OPTION label = "SKU"
+                     altValue = "sku"
+                     editorType = "text"
+                     autoQuote  = "true" />
+    </FLEXSQLMODIFIERCOMPONENT>
+
+    <SPLITPANE divider = "200"
+               orientation = "horizontal" >
+      <FLEXLISTCOMPONENT name = "POs"
+                         greenbar = "true"
+                         log = "true"
+                         rowHeight = "18"
+                         autoSelect = "true">
+
+        <DBCONNECT type = "global" />
+
+         <!-- name of component being listened to -->
+        <TRIGGER name = "OrderFilter" />
+
+        <LIST key = "OrderFilter:execute"
+              title = "POs"
+              icon = "workorder.gif"
+              color = "sienna" >
+
+          <SELECT sql = "CALL AsnOrderStatusScreen(//receivedDate,
+                                                   '',
+                                                   //PO,
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   '',
+                                                   //Status,
+                                                   '',
+                                                   //SKU)" />
+        </LIST>
+      </FLEXLISTCOMPONENT>
+
+      <!--
+        - Work Order
+       -->
+      <TABPANE tabplacement = "top">
+
+        <!--
+          - ORDERS TAB
+         -->
+        <TAB  title = "PO" >
+          <SPLITPANE divider = "200"
+                     orientation = "vertical" >
+            <!-- every flex component has a name which is needed for referencing and attaching listeners-->
+            <FLEXTABLECOMPONENT name = "StatusTable"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+
+              <!-- name of component being listened to -->
+              <TRIGGER name = "POs" />
+
+              <TABLE key = "POs" >
+                <SELECT sql = "call AsnOrderStatusScreenGetWorkOrders(//POs)"/>
+
+                  <TABLECOLUMNS>
+                    <TABLECOLUMN name = "Flags"
+                                 align = "right"/>
+                 </TABLECOLUMNS>
+
+                <ALTVALUES>
+                  <FIELD name = "Status"
+                         ifdef = "workOrderStatuses" />
+                  <FIELD name = "State"
+                         ifdef = "workOrderStates" />
+                  <FIELD name = "Flags"
+                         ifdef = "workOrderFlags" />
+                </ALTVALUES>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+
+            <FLEXTABLECOMPONENT name = "AsnExtras"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+
+              <!-- name of component being listened to -->
+              <TRIGGER name = "POs" />
+
+              <TABLE key = "POs" >
+                <SELECT sql = "Select VendorName,
+                                  BuyerName,
+                                  date(deliveryDate) DeliveryDate,
+                                  DeliveryHour,
+                                  date(poDate) PODate,
+                                  date(cancelByDate) CancelByDate
+                             from JacentPurchaseOrder
+                             where orderNo = //POs"/>
+
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "DeliveryHour"
+                               align = "right"/>
+               </TABLECOLUMNS>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+          </SPLITPANE>
+        </TAB>
+
+        <!--
+          - WORK ORDER LINES tab
+          -->
+        <TAB  title = "Lines">
+          <SPLITPANE divider = "200"
+                     orientation = "vertical" >
+            <FLEXTABLECOMPONENT name = "LinesTableUpper"
+                                greenbar = "true"
+                                log = "true">
+
+              <DBCONNECT type = "global" />
+
+              <TRIGGER name = "POs" />
+
+              <TABLE key = "POs" >
+
+                <SELECT sql = "CALL JacentAsnOrderLinesScreen(//POs,
+                                                        '',
+                                                        'l.lineNo')"/>
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "LineNo"
+                               align = "right"/>
+                  <TABLECOLUMN name = "QtyRequired"
+                               align = "right"/>
+                  <TABLECOLUMN name = "TotQtyRec"
+                               align = "right"/>
+                  <TABLECOLUMN name = "status"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Flags"
+                               align = "right"/>
+               </TABLECOLUMNS>
+
+                <EDITOR restoreHide = "true"
+                        title = "Order Line"
+                        saveText = "Save"
+                        cancelText = "Cancel">
+                  <FIELD name = "Status"
+                         required = "true">
+                    <COMBO loadEmptyItem = "true"
+                           ifdef = "woLineStatuses"/>
+                  </FIELD>
+                  <FIELD name = "QtyRequired"
+                         required = "true">
+                    <NUMERICFIELD/>
+                  </FIELD>
+                  <FIELD name = "Flags"
+                         required = "true">
+                    <POPUPBITVALUEEDITOR maxRows = "5">
+                      <BIT_VALUES ifdef = "workOrderLineFlags"/>
+                    </POPUPBITVALUEEDITOR>
+                  </FIELD>
+                </EDITOR>
+
+                <ALTVALUES>
+                  <FIELD name = "Status"
+                         ifdef = "workOrderLineStatuses" />
+                  <FIELD name = "Flags"
+                         ifdef = "workOrderLineFlags" />
+                </ALTVALUES>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+
+            <!--
+               - Lower Panel
+              -->
+            <FLEXTABLECOMPONENT name = "LinesTableLower"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+              <TRIGGER name = "LinesTableUpper" />
+
+              <TABLE key = "LinesTableUpper:POs"
+                     title = "Line Item Details">
+                <SELECT sql = "call JacentAsnOrderLineOpersScreen(//POs,
+                                                                  //Line,
+                                                                  '',
+                                                                  'o.idx')"/>
+
+                <DELETE sql = "Delete from workOrderLineOperations
+                                 where workOrderId = //OrderId
+                                   and lineNo = //lineNo
+                                   and idx = //idx" />
+                <ALTVALUES>
+                  <FIELD name = "Status"
+                         ifdef = "workOrderLineStatuses" />
+                </ALTVALUES>
+
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "Qty"
+                               preferredWidth = "45"
+                               maxWidth = "50"
+                               align = "right"/>
+
+                  <TABLECOLUMN name = "Qty Completed"
+                               preferredWidth = "45"
+                               maxWidth = "50"
+                              align = "right"/>
+
+                  <TABLECOLUMN name = "Line"
+                               preferredWidth = "45"
+                               maxWidth = "50"
+                              align = "right"/>
+
+                  <TABLECOLUMN name = "Idx"
+                               preferredWidth = "45"
+                               maxWidth = "50"
+                              align = "right"/>
+
+                  <TABLECOLUMN name = "Flags"
+                               preferredWidth = "55"/>
+
+                  <TABLECOLUMN name = "Status"
+                               preferredWidth = "55"
+                               maxWidth = "55"
+                              align = "left"/>
+
+                  <TABLECOLUMN name = "ZoneId"
+                               hide = "true"/>
+                  <TABLECOLUMN name = "RouteId"
+                               hide = "true"/>
+                  <TABLECOLUMN name = "AltMoveableUnitId"
+                               hide = "true"/>
+                </TABLECOLUMNS>
+
+                <EDITOR restoreHide = "true"
+                        title = "Order Line"
+                        saveText = "Save"
+                        cancelText = "Cancel">
+                  <FIELD name = "MoveableUnitId"
+                         required = "true">
+                    <TEXTFIELD/>
+                  </FIELD>
+
+                  <FIELD name = "Status"
+                         required = "true">
+                    <COMBO loadEmptyItem = "true"
+                           ifdef = "woLineStatuses"/>
+                  </FIELD>
+
+                  <FIELD name = "QtyCompleted"
+                         required = "true">
+                    <NUMERICFIELD/>
+                  </FIELD>
+
+                  <FIELD name = "Flags"
+                         required = "true">
+                    <POPUPBITVALUEEDITOR maxRows = "5">
+                      <BIT_VALUES ifdef = "workOrderLineFlags"/>
+                    </POPUPBITVALUEEDITOR>
+                  </FIELD>
+                </EDITOR>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+          </SPLITPANE>
+        </TAB>
+
+        <!--
+          - Moveable Unit tab
+          -->
+        <TAB title = "Pallets" >
+          <SPLITPANE divider = "200" orientation = "vertical" >
+            <FLEXTABLECOMPONENT name = "PalletTable"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+              <TRIGGER name = "POs" />
+
+              <TABLE key = "POs"
+                     title = "Pallets">
+                <SELECT sql = "call AsnOrderPalletsScreen(//POs, '', 'PalletId')" />
+
+                <ALTVALUES>
+                  <FIELD name = "Status"
+                         ifdef = "moveableUnitCLusterStatuses" />
+                  <FIELD name = "Flags"
+                         ifdef = "moveableUnitCLusterFlags" />
+                </ALTVALUES>
+
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "CaseCt"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Qty"
+                               align = "right"/>
+                </TABLECOLUMNS>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+
+            <!--
+              - Lower Panel
+             -->
+            <FLEXTABLECOMPONENT name = "Carton"
+                                greenbar = "true"
+                                log = "true">
+              <DBCONNECT type = "global" />
+              <TRIGGER name = "PalletTable" />
+
+              <TABLE key = "PalletTable:POs"
+                     title = "Cartons">
+                <SELECT sql = "select s.StorageId,
+                                      s.status,
+                                      i.Unit,
+                                      i.UnitType,
+                                      i.Qty,
+                                      muc.LocationId,
+                                      dateformat(s.receivedTs, 'yyyy-mm-dd') ReceivedTs,
+                                      dateformat(s.Ts, 'yyyy-mm-dd') Ts
+                                  from MoveableUnitClusters muc
+                                  join Storage s
+                                  join Inventory i
+                                  where s.clusterId = //PalletId" />
+
+                <ALTVALUES>
+                  <FIELD name = "Status"
+                         ifdef = "storageStatuses" />
+                </ALTVALUES>
+
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "Qty"
+                               align = "right"/>
+                </TABLECOLUMNS>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+          </SPLITPANE>
+        </TAB>
+      </TABPANE>
+    </SPLITPANE>
+  </SPLITPANE>
+ </FLEXSCREEN>

@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     scaleLog.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: scaleLog.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Scale Log" 
+            height = "500" 
+            width = "1200" 
+            frametype = "internal"
+            globalThreading = "true">
+
+  <DBCONNECT type = "predefined" connectionId = "default" setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "containerLogCodes"
+            loadSql = "select '' as returnCodeMsg, '' as mnemonicCode
+                       union
+                       select returnCodeMsg, mnemonicCode
+                         from MnemonicCodesView
+                         where mnemonicType = 'CONTAINER_LOG_STATUSES'
+                           and mnemonicCode in ('CALCULATED_WEIGHT_NOT_SET',
+                                                'INVALID_WEIGHT',
+                                                'WEIGHT_CHECK_BYPASSED',
+                                                'WEIGHT_OUT_OF_RANGE',
+                                                'WEIGHT_PASSED',
+                                                'WEIGHT_TOLERANCE_NOT_SET')
+                         order by returnCodeMsg" />
+
+    <VECTORMAP name = "containerLogStatuses"
+               loadSql = "select idx, returnCodeMsg
+                            from mnemonicCodesView
+                           where mnemonicType = 'CONTAINER_LOG_STATUSES'"/>
+
+    <VECTORMAP name = "toleranceModes"
+               loadSql = "select idx, returnCodeMsg
+                            from mnemonicCodesView
+                           where mnemonicType = 'SCALE_TOLERANCE_MODES'"/>
+
+    <VECTORMAP name = "scales"
+               loadSql = "select description,
+                                 sorterId
+                            from (select 0, ''
+                          union
+                          select sorterId,
+                                 description
+                            from scales)
+                            as x(sorterId, description)
+                            order by sorterId" />
+
+    <VECTORMAP name = "orderBy" >
+      <ITEM key = "Ts Descending"  value = "order by sl.Ts desc" />
+      <ITEM key = "Ts Ascending"   value = "order by sl.Ts asc" />
+      <ITEM key = "Scale Descending"  value = "order by s.description desc" />
+      <ITEM key = "Scale Ascending"  value = "order by s.description asc" />
+      <ITEM key = "Container Descending"  value = "order by sl.containerId desc" />
+      <ITEM key = "Container Ascending"  value = "order by sl.containerId asc" />
+    </VECTORMAP>
+  </GLOBAL_DEFINITIONS>
+
+  <BORDER_COMPONENT orientation = "south" >
+    <ACTIVITY_PANEL labelColor = "red" messageColor = "blue" >
+      <SOURCE sourceName = "ScaleTable" /> 
+      <SOURCE sourceName = "ScaleTotals" /> 
+      <SOURCE sourceName = "ScaleHourlyDetails" /> 
+    </ACTIVITY_PANEL>
+  </BORDER_COMPONENT>
+
+  <TABPANE>
+    <TAB title = "Log">
+      <SPLITPANE divider = "125" orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "scaleLogFilter"
+                                   appendAsAnd = "true"
+                                   makeAbsolute = "false"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   labelsOnTop = "false"
+                                   maxFilterRows = "2"
+                                   editorWidth = "150"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "false"
+                                   orientation = "vertical"
+                                   roundedCorners = "true">
+          <DBCONNECT type = "global"/>
+
+          <FILTER_OPTION label = "ScaleId"
+                         altValue = "ScaleId"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "scales"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "ContainerId"
+                         altValue = "ContainerId"
+                         editorType = "text"
+                         autoQuote = "true" />
+
+          <FILTER_OPTION label = "Status"
+                         altValue = "Status"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "containerLogCodes"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "FromDate"
+                         altValue = "FromDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" deselectEnabled = "true"
+                               monthsPast = "36" monthsFuture = "0" date = "0"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "FromTime"
+                         altValue = "FromTime"
+                         editorType = "text"
+                         autoQuote = "true"/>
+
+          <FILTER_OPTION label = "ORDER_BY"
+                         altValue = "OrderBy"
+                         editorType = "combo"
+                         autoQuote = "true">
+            <COMBO_OPTIONS ifdef = "orderBy"/>
+          </FILTER_OPTION>
+        </FLEXSQLMODIFIERCOMPONENT>
+
+        <FLEXTABLECOMPONENT name = "ScaleTable" greenbar = "true"  
+                            refresh = "true"
+                            ignoreEventConcatenation = "true">
+          <DBCONNECT type = "global" />
+          <TRIGGER name = "scaleLogFilter" />
+
+          <TABLE key = "scaleLogFilter:execute">
+            <SELECT sql = "call ScaleLogScreenEx(//ScaleId,
+                                                 //ContainerId,
+                                                 //Status,
+                                                 //FromDate,
+                                                 //FromTime,
+                                                 //OrderBy,
+                                                 'Y')"/>
+
+            <TABLECOLUMNS>                             
+              <TABLECOLUMN name = "ScaleId"   
+                           preferredWidth = "100"
+                           maxWidth = "100" />
+                           
+              <TABLECOLUMN name = "Weight"   
+                           align = "right"
+                           preferredWidth = "70"
+                           maxWidth = "70" />
+                           
+              <TABLECOLUMN name = "CalculatedWeight"   
+                           align = "right"
+                           preferredWidth = "100"
+                           maxWidth = "100"/>
+                           
+              <TABLECOLUMN name = "MinWeight"   
+                           align = "right"
+                           preferredWidth = "80"
+                           maxWidth = "80"/>
+                           
+              <TABLECOLUMN name = "Max Weight"   
+                           align = "right"
+                           preferredWidth = "80"
+                           maxWidth = "80"/>
+                           
+              <TABLECOLUMN name = "Tolerance"   
+                           align = "right"
+                           preferredWidth = "80"
+                           maxWidth = "80"/>
+                           
+              <TABLECOLUMN name = "UpperAccuracy"   
+                           align = "right"
+                           preferredWidth = "90"
+                           maxWidth = "90"/>
+                           
+              <TABLECOLUMN name = "LowerAccuracy"   
+                           align = "right"
+                           preferredWidth = "90"
+                           maxWidth = "90"/>
+            </TABLECOLUMNS>
+            
+            <ALTVALUES>
+              <FIELD name = "ToleranceMode" ifdef = "toleranceModes" />
+              <FIELD name = "Status"  ifdef = "containerLogStatuses" />
+            </ALTVALUES>
+          </TABLE>
+        </FLEXTABLECOMPONENT>
+      </SPLITPANE>
+    </TAB>
+    
+    <TAB title = "Statistics">
+      <SPLITPANE divider = "120" 
+                 orientation = "horizontal" >
+
+        <FLEXLISTCOMPONENT name     = "ScaleStats"
+                           init     = "scaleList"
+                           refresh  = "true"
+                           greenbar = "true"
+                           log      = "true">
+
+          <DBCONNECT type = "global" />
+          <LIST key   = "scaleList"
+                title = "DATES"
+                icon  = "workorder.gif"
+                color = "sienna" >
+
+            <SELECT sql = "select distinct(dateformat(ts, 'yyyy-mm-dd')) Dates
+                             from ScaleLog
+                             order by Dates desc" />
+          </LIST>
+        </FLEXLISTCOMPONENT>
+
+        <SPLITPANE divider = "100"
+                   orientation = "vertical">
+          <!--
+           - Every flex component has a name which is needed for referencing
+           - and attaching listeners.
+          -->
+          <FLEXTABLECOMPONENT name     = "ScaleTotals"
+                              greenbar = "true"
+                              sortable = "true"
+                              log      = "true">
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ScaleStats" />
+            <TABLE key = "ScaleStats"
+                   title = "Daily Totals">
+              <SELECT sql = "call ScaleStatisticsLogGetDailyTotal(//ScaleStats, 20)"/>;       
+                               
+              <TABLECOLUMNS>                             
+                <TABLECOLUMN name = "SorterId"
+                             hide = "true" />
+
+                <TABLECOLUMN name = "ByPassed"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "TOTAL"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "WeightOk"
+                             align = "right" />
+
+                <TABLECOLUMN name = "UnderWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "PctUnderWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "OverWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "PctOverWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "Other"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "WeightReject"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "PctRejected"
+                             align = "right"/>
+             </TABLECOLUMNS>
+             
+            <ALTVALUES>
+            </ALTVALUES>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+          
+          <FLEXTABLECOMPONENT name     = "ScaleHourlyDetails"
+                              greenbar = "true"
+                              sortable = "true"
+                              log      = "true">
+                              
+            <DBCONNECT type = "global" />
+            <TRIGGER name = "ScaleTotals" />
+            <TABLE key = "ScaleTotals:ScaleStats"
+                   title = "Hourly Totals">
+              <SELECT sql = "call ScaleStatisticsLogGetHourlyTotal(//Day,
+                                                                   //SorterId)" />
+
+              <TABLECOLUMNS>                             
+                <TABLECOLUMN name = "Day"   
+                             hide = "true" />
+
+                <TABLECOLUMN name = "SorterId"
+                             hide = "true" />
+
+                <TABLECOLUMN name = "ScaleId"
+                             hide = "true" />
+
+                <TABLECOLUMN name = "ByPassed"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "TOTAL"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "WeightOk"
+                             align = "right" />
+
+                <TABLECOLUMN name = "UnderWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "PctUnderWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "OverWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "PctOverWeight"
+                             align = "right" />
+
+                <TABLECOLUMN name = "Other"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "WeightReject"
+                             align = "right"/>
+
+                <TABLECOLUMN name = "PctRejected"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+        </SPLITPANE>
+      </SPLITPANE>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

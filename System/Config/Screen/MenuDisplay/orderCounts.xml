@@ -1,0 +1,427 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     orderCounts.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: orderCounts.xml 11032 2018-11-14 20:02:55Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Order Counts" 
+            height = "800" 
+            width = "1200" 
+            frametype = "internal"
+            report = "true">
+
+  <!-- a dbConnect here is a universal connect object  -->
+  <DBCONNECT type = "predefined" connectionId = "default" setglobal = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+    <VECTORMAP name = "DateTypes">
+      <ITEM key = "Date Picked" 
+            value = "pickDate" />
+      <ITEM key = "Received Date" 
+            value = "receivedDate" />
+    </VECTORMAP>
+
+    <VECTORMAP name = "allocationStatuses"
+               loadSql = "select idx, returnCodeMsg 
+                             from MnemonicCodesView 
+                             where mnemonicType = 'ALLOCATION_STATUSES' 
+                             order by idx" />
+
+    <VECTORMAP name = "workOrderStatuses"
+               loadSql = "select idx, returnCodeMsg 
+                             from MnemonicCodesView 
+                             where mnemonicType = 'WORK_ORDER_STATUSES' 
+                             order by idx" />
+
+    <VECTORMAP name = "workOrderFlags"
+               loadSql = "select idx, returnCodeMsg 
+                            from MnemonicCodesView 
+                            where mnemonicType = 'WORK_ORDER_FLAGS'
+                            order by idx" />
+                            
+    <VECTORMAP name = "workOrderLineStatuses"
+               loadSql = "select idx, returnCodeMsg 
+                             from MnemonicCodesView 
+                             where mnemonicType = 'WORK_ORDER_LINE_STATUSES'
+                             order by idx" />
+                             
+    <VECTORMAP name = "shipMgrShipmentPackageStatuses"
+               loadSql = "select idx, returnCodeMsg 
+                             from MnemonicCodesView 
+                             where mnemonicType = 'SHIP_MGR_SHIPMENT_PACKAGE_STATUSES' 
+                             order by idx" />
+
+  </GLOBAL_DEFINITIONS>
+
+  <TABPANE>
+    <TAB title = "Daily Summary">
+      <SPLITPANE divider = "60" 
+                 orientation = "vertical">
+        <FLEXSQLMODIFIERCOMPONENT  name = "OrderCountsFilter"
+                                   appendAsAnd = "false"
+                                   makeAbsolute = "true"
+                                   autoResize = "false"
+                                   autoExecute = "true"
+                                   labelsOnTop = "false"
+                                   maxFilterRows = "1"
+                                   editorWidth = "90"
+                                   showCheckBoxes = "false"
+                                   filterBorderText = "Filter Criteria"
+                                   filterBorderColor = "blue"
+                                   okButtonText = "Execute"
+                                   passiveMode = "true"
+                                   orientation = "horizontal"
+                                   roundedCorners = "true" >
+
+          <DBCONNECT type = "global" />
+          
+          <FILTER_OPTION label = "Date Type"
+                         altValue = "dateType"
+                         editorType = "combo"
+                         autoQuote = "true" >
+            <COMBO_OPTIONS ifdef = "DateTypes" />
+          </FILTER_OPTION>
+
+          <FILTER_OPTION label = "From Date"
+                         altValue = "fromDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "2"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+                
+          <FILTER_OPTION label = "To Date"
+                         altValue = "toDate"
+                         editorType = "calendar"
+                         autoQuote = "true" >
+            <CALENDAR_OPTIONS  pastEnabled = "true" 
+                               deselectEnabled = "true"
+                               monthsPast = "6" 
+                               monthsFuture = "2"
+                               format = "yyyy-MM-dd"/>
+          </FILTER_OPTION>
+          
+        </FLEXSQLMODIFIERCOMPONENT>
+                 
+        <!-- tab divided for two tables -->
+        <SPLITPANE divider = "150" 
+                   orientation = "vertical">
+          <FLEXTABLECOMPONENT name = "ClusterOrderCountsTable"
+                              init = "desc" 
+                              refresh = "true" 
+                              records = "100"
+                              greenbar = "true">
+
+            <DBCONNECT type = "global" />
+            <!-- the key in table supplies the key for remaining sql -->
+            <TRIGGER name = "OrderCountsFilter" />
+            <TABLE key = "OrderCountsFilter:execute" >
+              <SELECT sql = "call OrderCountsScreenSummary(//dateType,
+                                                           //fromDate,
+                                                           //toDate,
+                                                           'CLUSTER')"/>
+
+              <TABLECOLUMNS>
+                <TABLECOLUMN name = "Loaded"
+                             align = "right"/>
+                <TABLECOLUMN name = "OnHold"
+                             align = "right"/>
+                <TABLECOLUMN name = "Idle"
+                             align = "right"/>
+                <TABLECOLUMN name = "Prepared"
+                             align = "right"/>
+                <TABLECOLUMN name = "Waved"
+                             hide = "true"/>
+                <TABLECOLUMN name = "Released"
+                             align = "right"/>
+                <TABLECOLUMN name = "Planned"
+                             align = "right"/>
+                <TABLECOLUMN name = "Picking"
+                             align = "right"/>
+                <TABLECOLUMN name = "Picked"
+                             align = "right"/>
+                <TABLECOLUMN name = "Packing"
+                             hide = "true"/>
+                <TABLECOLUMN name = "Packed"
+                             hide = "true"/>
+                <TABLECOLUMN name = "Shipping"
+                             align = "right"/>
+                <TABLECOLUMN name = "Shipped"
+                             align = "right"/>
+                <TABLECOLUMN name = "Incomplete"
+                             align = "right"/>
+                <TABLECOLUMN name = "Complete"
+                             align = "right"/>
+                <TABLECOLUMN name = "Cancelled"
+                             align = "right"/>
+              </TABLECOLUMNS>
+            </TABLE>
+          </FLEXTABLECOMPONENT>
+
+          <SPLITPANE divider = "80" 
+                     orientation = "vertical">
+            <!-- upper middle table is to display orders -->
+            <FLEXTABLECOMPONENT name = "ClusterOrderCountsTableTotals" 
+                                greenbar = "true">
+
+              <DBCONNECT type = "global" />
+
+              <TRIGGER name = "OrderCountsFilter" />
+              <TABLE key = "OrderCountsFilter:execute" 
+                     title = "Totals">
+                <SELECT sql = "call OrderCountsScreenTotal(//dateType,
+                                                           //fromDate,
+                                                           //toDate,
+                                                           'CLUSTER')"/>
+                                                           
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "Loaded"
+                               align = "right"/>
+                  <TABLECOLUMN name = "OnHold"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Idle"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Prepared"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Waved"
+                               hide = "true"/>
+                  <TABLECOLUMN name = "Released"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Planned"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Picking"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Picked"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Packing"
+                               hide = "true"/>
+                  <TABLECOLUMN name = "Packed"
+                               hide = "true"/>
+                  <TABLECOLUMN name = "Shipping"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Shipped"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Incomplete"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Complete"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Cancelled"
+                               align = "right"/>
+                </TABLECOLUMNS>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+
+            <SPLITPANE divider = "80" 
+                       orientation = "vertical">
+              <!-- upper middle table is to display orders -->
+              <FLEXTABLECOMPONENT name = "OrderCountsTodayTotals" 
+                                  greenbar = "true">
+
+                <DBCONNECT type = "global" />
+                <TRIGGER name = "ClusterOrderCountsTable" />
+                <TABLE key = "ClusterOrderCountsTable:OrderCountsFilter:execute" 
+                       title = "Todays Totals">
+                  <SELECT sql = "select coalesce(date(w.completeTs), date(o.ts)) 'Day',
+                                        count(distinct if w.status = gWoLoaded then w.workOrderId else null endif) 'Loaded',
+                                        count(distinct if w.status = gWoOnHold then w.workOrderId else null endif) 'OnHold',
+                                        count(distinct if w.status = gWoIdle then w.workOrderId else null endif) 'Idle',
+                                        count(distinct if w.status = gWoPrepared then w.workOrderId else null endif) 'Prepared',
+                                        count(distinct if w.status = gWoReleased then w.workOrderId else null endif) 'Released',
+                                        count(distinct if w.status = gWoPlanned then w.workOrderId else null endif) 'Planned',
+                                        count(distinct if w.status = gWoPicking then w.workOrderId else null endif) 'Picking',
+                                        count(distinct if w.status = gWoPicked then w.workOrderId else null endif) 'Picked',
+                                        count(distinct if w.status = gWoPacking then w.workOrderId else null endif) 'Packing',
+                                        count(distinct if w.status = gWoPacked then w.workOrderId else null endif) 'Packed',
+                                        count(distinct if w.status = gWoShipping then w.workOrderId else null endif) 'Shipping',
+                                        count(distinct if w.status = gWoShipped then w.workOrderId else null endif) 'Shipped',
+                                        count(distinct if w.status &lt; gWoComplete then w.workOrderId else null endif) 'Incomplete',
+                                        count(distinct if w.status = gWoComplete then w.workOrderId else null endif) 'Complete',
+                                        count(distinct if w.status = gWoCancelled then w.workOrderId else null endif) 'Cancelled',
+                                        count(distinct w.workOrderId) 'Total'
+                                   from workorders w
+                                   join workorderlines l
+                                   join WorkOrderLineOperations o
+                                  where w.workOrderType = 'CLUSTER'
+                                    and Day = //Day
+                                  group by Day"/>
+
+                  <TABLECOLUMNS>
+                    <TABLECOLUMN name = "Loaded"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "OnHold"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Idle"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Prepared"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Released"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Planned"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Picking"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Picked"
+                                 align = "right"/>
+                    <TABLECOLUMN name = "Packing"
+                                 hide = "true"/>
+                    <TABLECOLUMN name = "Packed"
+                                 hide = "true"/>
+                    <TABLECOLUMN name = "Shipping"
+                                 align = "right"/>
+                  <TABLECOLUMN name = "Shipped"
+                                 align = "right"/>
+                  <TABLECOLUMN name = "Incomplete"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Complete"
+                               align = "right"/>
+                  <TABLECOLUMN name = "Cancelled"
+                               align = "right"/>
+                    <TABLECOLUMN name = "Total"
+                                 align = "right"/>
+                </TABLECOLUMNS>
+              </TABLE>
+            </FLEXTABLECOMPONENT>
+            
+              <SPLITPANE divider = "180" 
+                       orientation = "vertical">
+              <SPLITPANE divider = "200"
+                         orientation = "horizontal">
+                <FLEXTABLECOMPONENT name = "ClusterByDateAndStatus"
+                                    greenbar = "true">
+                  <DBCONNECT type = "global" />
+                  <TRIGGER name = "ClusterOrderCountsTable" />
+                  <TABLE key = "ClusterOrderCountsTable:OrderCountsFilter:execute"
+                         title = "Status">
+                    <SELECT sql = "call OrderCountsStatus(//dateType,
+                                                          //Day,
+                                                          'CLUSTER')"/>
+
+                    <TABLECOLUMNS>
+                      <TABLECOLUMN name = "intStatus"
+                                   hide = "true"/>
+                    </TABLECOLUMNS>
+                    <ALTVALUES>
+                      <FIELD name = "Status" 
+                             ifdef = "workOrderStatuses" />
+                    </ALTVALUES>
+                  </TABLE>
+                </FLEXTABLECOMPONENT> 
+                <FLEXTABLECOMPONENT name = "ClusterOrderCountsTableMiddle" 
+                                    greenbar = "true">
+
+                  <DBCONNECT type = "global" />
+
+                  <TRIGGER name = "ClusterOrderCountsTable" />
+                  <TRIGGER name = "ClusterByDateAndStatus" />
+                  <TABLE key = "ClusterByDateAndStatus:ClusterOrderCountsTable:OrderCountsFilter:execute"
+                         title = "Orders">
+                    <SELECT sql = "call OrderCountsScreenOrders(//dateType,
+                                                                //Day,
+                                                                //intStatus,
+                                                                'CLUSTER')"/>
+
+                    <TABLECOLUMNS>
+                      <TABLECOLUMN name = "OpenLines"
+                                   align = "right"/>
+                      <TABLECOLUMN name = "PickedLines"
+                                   align = "right"/>
+                      <TABLECOLUMN name = "QtyToPick"
+                                   align = "right"/>
+                      <TABLECOLUMN name = "QtyPicked"
+                                   align = "right"/>
+                    </TABLECOLUMNS>
+
+                    <ALTVALUES>
+                      <FIELD name = "Status" 
+                             ifdef = "workOrderStatuses" />
+                    </ALTVALUES>
+                  </TABLE>
+                </FLEXTABLECOMPONENT>
+              </SPLITPANE>
+              
+              <TABPANE>
+                <TAB title = "Lines">
+                  <FLEXTABLECOMPONENT name = "ClusterOrderCountsTableDetail" 
+                                      greenbar = "true">
+
+                    <DBCONNECT type = "global" />
+
+                    <TRIGGER name = "ClusterOrderCountsTableMiddle" />
+                    <TABLE key = "ClusterOrderCountsTableMiddle:ClusterByDateAndStatus:ClusterOrderCountsTable:OrderCountsFilter:execute"
+                           title = "Order Lines">
+                      <SELECT sql = "Select l.Unit,
+                                            l.QtyRequired,
+                                            l.Status,
+                                            o.MoveableUnitId,
+                                            o.LocationId,
+                                            a.QtyAllocated,
+                                            a.status AllocationStatus
+                                       from WorkOrderLines l
+                                       join WorkOrderLineOperations o                              
+                                       left outer join Allocations a
+                                         on o.workOrderId = a.workOrderId
+                                        and o.lineNo = a.workOrderLineNo
+                                        and o.idx = a.workOrderLineNoIdx
+                                             where o.workOrderId = //WorkOrderId"/>
+                                             
+                      <TABLECOLUMNS>
+                        <TABLECOLUMN name = "QtyRequired"
+                                     align = "right"/>
+                        <TABLECOLUMN name = "QtyAllocated"
+                                     align = "right"/>
+                      </TABLECOLUMNS>
+ 
+                      <ALTVALUES>
+                        <FIELD name = "Status" 
+                               ifdef = "workOrderLineStatuses" />
+                        <FIELD name = "AllocationStatus" 
+                               ifdef = "allocationStatuses" />
+                      </ALTVALUES>
+                    </TABLE>
+                  </FLEXTABLECOMPONENT>    
+                </TAB>
+                
+                <TAB title = "Boxes">
+                  <FLEXTABLECOMPONENT name = "ClusterMuCountsTableDetail" 
+                                      greenbar = "true">
+
+                    <DBCONNECT type = "global" />
+
+                    <TRIGGER name = "ClusterOrderCountsTableMiddle" />
+                    <TABLE key = "ClusterOrderCountsTableMiddle:ClusterByDateAndStatus:ClusterOrderCountsTable:OrderCountsFilter:execute"
+                           title = "Order Lines">
+                      <SELECT sql = "select distinct w.WorkOrderId 
+                                            , wolo.MoveableUnitId
+                                            , c.ContainerId
+                                            , cai.AlternateId
+                                       from WorkOrders w
+                                       join WorkOrderLines wol
+                                       join WorkOrderLineOperations wolo
+                                       left outer join Containers c
+                                         on w.workOrderId = c.orderNo
+                                        and c.containerId != wolo.moveableUnitId
+                                       left outer join ContainerAlternateId cai
+                                      where w.workOrderId = //WorkOrderId
+                                      order by w.WorkOrderId" />
+                    </TABLE>
+                  </FLEXTABLECOMPONENT>    
+                </TAB>
+              </TABPANE>            
+            </SPLITPANE>
+          </SPLITPANE>
+        </SPLITPANE>
+      </SPLITPANE>
+      </SPLITPANE>     
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>

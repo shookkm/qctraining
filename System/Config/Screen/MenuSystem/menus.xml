@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     menus.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: menus.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<menuSystem>
+      <menu commandId = "sysMenu" 
+            text = "System" 
+            accelerator = "S">
+        <menuitem commandId = "sysParams" 
+                  text = "System Parameters"
+                  handler = "defaultScreen"/>
+        <menuitem commandId = "securityAdmin" 
+                  text = "Security"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "operators" 
+                  text = "Operators/Notifications"
+                  handler = "defaultScreen" />
+
+                  <menuitem commandId = "processes" 
+                  text = "System Processes"
+                  handler = "defaultScreen"/>
+
+        <separator />
+
+        <menuitem commandId = "FTP" 
+                  text = "FTP Files"
+                  handler = "defaultScreen" />
+
+        <separator />
+
+        <menuitem commandId = "sorterConfig" 
+                  text = "Sorter Configuration"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "routeMaint" 
+                  text = "Route Maintenance"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "sortDestinations" 
+                  text = "Sort Destinations"
+                  handler = "defaultScreen" />
+        <separator />
+        <menuitem commandId = "scales" 
+                  text = "Scale Maintenance"
+                  handler = "defaultScreen" />
+        <menuitem commandId = "inkjetMaint" 
+                  text = "Ink Jet Maintenance"
+                  handler = "defaultScreen" />
+      <Include includeFlag = "0x004"
+               filename = "$SCREEN_CONFIG_DIR/MenuSystem/locationPlans.xml"/>
+      </menu>
+</menuSystem>

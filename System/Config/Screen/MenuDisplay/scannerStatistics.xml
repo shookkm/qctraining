@@ -1,0 +1,197 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     scannerStatistics.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: scannerStatistics.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title           = "Scanner Statistics"
+            height          = "550"
+            width           = "950"
+            frametype       = "internal"
+            globalThreading = "false">
+
+  <DBCONNECT type         = "predefined"
+             connectionId = "default"
+             setglobal    = "true"/>
+
+  <INIT_ACTIONS>
+    <INIT_ACTION type = "call" 
+                 value = "CreateGlobalVariables" />
+  </INIT_ACTIONS>
+
+  <GLOBAL_DEFINITIONS>
+  </GLOBAL_DEFINITIONS>
+
+  <SPLITPANE divider = "100" 
+             orientation = "horizontal" >
+    <FLEXLISTCOMPONENT name     = "ReportList"
+                       init     = "reportList"
+                       refresh  = "true"
+                       greenbar = "true"
+                       log      = "true">
+
+      <DBCONNECT type = "global" />
+      <LIST key   = "reportList"
+            title = "DATES"
+            icon  = "workorder.gif"
+            color = "sienna" >
+
+        <SELECT sql = "select distinct dateformat(dateHour, 'YYYY-MM-DD') Dates
+                         from ScannerStatisticsLog
+                        order by Dates desc" />
+      </LIST>
+    </FLEXLISTCOMPONENT>
+
+    <SPLITPANE divider = "200"
+               orientation = "vertical">
+      <!--
+       - Every flex component has a name which is needed for referencing
+       - and attaching listeners.
+      -->
+      <FLEXTABLECOMPONENT name     = "ScannerTotals"
+                          greenbar = "true"
+                          sortable = "true"
+                          log      = "true">
+        <DBCONNECT type = "global" />
+        <TRIGGER name = "ReportList" />
+        <TABLE key = "ReportList"
+               title = "Daily Totals">
+          <SELECT sql = "call ScannerStatisticsLogGetDailyTotal(//ReportList)"/>;       
+
+          <TABLECOLUMNS>
+            <TABLECOLUMN name = "ScannerId"   
+                         preferredWidth = "120"					   
+                         maxWidth = "180" />
+                         
+            <TABLECOLUMN name = "ReadCount"   
+                         align = "right" 
+                         preferredWidth = "60"					   
+                         minWidth = "60"
+                         maxWidth = "90" />
+                         
+            <TABLECOLUMN name = "NoReadCount"   
+                         align = "right" 
+                         preferredWidth = "80"					   
+                         minWidth = "80"
+                         maxWidth = "120" />
+                         
+            <TABLECOLUMN name = "NoDataCount"   
+                         align = "right" 
+                         preferredWidth = "80"					   
+                         minWidth = "80"
+                         maxWidth = "120" />
+                         
+            <TABLECOLUMN name = "MultiReadCount"   
+                         align = "right" 
+                         preferredWidth = "90"					   
+                         minWidth = "90"
+                         maxWidth = "135" />
+                          
+            <TABLECOLUMN name = "RunTime"   
+                         align = "right" 
+                         preferredWidth = "70"					   
+                         minWidth = "70"
+                         maxWidth = "105" />
+                         
+            <TABLECOLUMN name = "ReadsPerMin"   
+                         align = "right" 
+                         preferredWidth = "90"					   
+                         minWidth = "90"
+                         maxWidth = "135" />
+                          
+            <TABLECOLUMN name = "PeakReadsPerMin"   
+                         align = "right"
+                         preferredWidth = "110"					   
+                         minWidth = "110"
+                         maxWidth = "165" />
+                          
+            <TABLECOLUMN name = "PctGoodReads"   
+                         align = "right" 
+                         preferredWidth = "65"					   
+                         minWidth = "65"
+                         maxWidth = "95" />                         
+          </TABLECOLUMNS>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+
+      <FLEXTABLECOMPONENT name     = "ReportDetails"
+                          greenbar = "true"
+                          sortable = "true"
+                          log      = "true">
+        <DBCONNECT type = "global" />
+        <TRIGGER name = "ScannerTotals" />
+        <TABLE key = "ScannerTotals:ReportList"
+               title = "Hourly Totals">
+          <SELECT sql = "call ScannerStatisticsLogGetHourlyTotal(//ReportList,
+                                                                 //ScannerId)" />
+
+          <TABLECOLUMNS>            
+            <TABLECOLUMN name = "DateHour"   
+                         preferredWidth = "105"					   
+                         minWidth = "105"
+                         maxWidth = "160" />
+
+            <TABLECOLUMN name = "ReadCount"   
+                         align = "right" 
+                         preferredWidth = "60"					   
+                         minWidth = "60"
+                         maxWidth = "90" />
+
+            <TABLECOLUMN name = "NoReadCount"   
+                         align = "right" 
+                         preferredWidth = "80"					   
+                         minWidth = "80"
+                         maxWidth = "120" />
+
+            <TABLECOLUMN name = "NoDataCount"   
+                         align = "right" 
+                         preferredWidth = "80"					   
+                         minWidth = "80"
+                         maxWidth = "120" />
+
+            <TABLECOLUMN name = "MultiReadCount"   
+                         align = "right" 
+                         preferredWidth = "90"					   
+                         minWidth = "90"
+                         maxWidth = "135" />
+
+            <TABLECOLUMN name = "RunTime"   
+                         align = "right" 
+                         preferredWidth = "70"					   
+                         minWidth = "70"
+                         maxWidth = "105" />
+
+            <TABLECOLUMN name = "ReadsPerMin"   
+                         align = "right" 
+                         preferredWidth = "90"					   
+                         minWidth = "90"
+                         maxWidth = "135" />
+
+            <TABLECOLUMN name = "PeakReadsPerMin"   
+                         align = "right" 
+                         preferredWidth = "100"					   
+                         minWidth = "110"
+                         maxWidth = "165" />
+
+            <TABLECOLUMN name = "PctGoodReads"   
+                         align = "right" 
+                         preferredWidth = "65"					   
+                         minWidth = "65"
+                         maxWidth = "95" />                         
+                            
+          </TABLECOLUMNS>            
+
+          <ALTVALUES>
+          </ALTVALUES>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </SPLITPANE>
+  </SPLITPANE>
+</FLEXSCREEN>

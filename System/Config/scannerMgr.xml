@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     scannerMgr.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: scannerMgr.xml 9566 2017-09-06 17:08:37Z wlw $
+   - Notes:
+  -->
+<!--
+     Optional attributes with default values:
+         barcodePacked = true,
+         fourByteWords = false,
+         sendCommands = true;
+         barcodeLengthOffset = 11,
+         barcodeOffset = 12,
+         defaultWaveNumber = 1,
+         inductMessageLength = 10,
+         messageTypeOffset = 1,
+         scannerIdOffset = 7,
+         sequenceNumberOffset = 8,
+         statusOffset = 4;
+-->
+<ScannerMgr>
+  <!--
+       Define the database connections to be used.  Environmental variables
+       can be used in the values which will then be looked up.
+
+       Database connections are optional.
+    -->
+  <DbConnect id = "wcs" machine = "$DATABASE_MACHINE"
+             user = "scannerMgr" password = "scannerMgr"
+             database = "$DATABASE_NAME"
+             port = "$DATABASE_PORT"
+             adapter = "Library.Database.IAnywhereDatabaseAdapter"
+             trackStatements = "false"/>
+ 
+  <QcInit dbId="wcs" />
+
+  <!--
+       You must declare all plcInterface applications to connect to, including
+       the standard plcInterface.
+    -->
+  <TcpipNetwork>
+    <Server appName = "plcInterface" />
+  </TcpipNetwork>
+
+  <!--
+       This element is required.  The following attributes can be set and will
+       apply to all scanners:
+           noRead
+           noData
+           multiRead
+           generateSeqNo
+           inductNotice (PLC message type e.g. 202)
+    -->
+  <Scanners noRead = "?" noData = "!" multiRead = "#">
+    <!--
+         At least one Scanner element must be defined.  The following are 
+         REQUIRED:
+             id (scanner number)
+             name
+             destination (for forwarding read notice)
+
+         The following are required if not specified in the Scanners element:
+             noRead
+             noData
+             multiRead
+
+         The following are optional and will override the settings in the 
+         Scanners element:
+             generateSeqNo (default is false)
+             inductNotice (setting to empty string will result in no notice)
+
+         The following are completely optional:
+             filterClassName (to filter data coming from PLC prior to forwarding)
+             hostName (if data is coming directly from scanner IP)
+             inductPlcInterface (application to send induct notice; default plcInterface)
+      -->
+    <Scanner id = "1" name = "Shipping" destination = "toteMgr"/>
+  </Scanners>
+</ScannerMgr>

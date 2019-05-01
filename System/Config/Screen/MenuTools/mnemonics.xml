@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     mnemonics.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2017 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: mnemonics.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN title = "Mnemonics View"
+            height = "400"
+            width = "840"
+            frametype = "internal"
+            updateSecurity = "mnemonics.edit" >
+
+  <DBCONNECT type         = "predefined"
+             connectionId = "default"
+             setglobal    = "true"/>
+
+  <GLOBAL_DEFINITIONS>
+
+
+    <VECTOR name = "operators1">
+      <ITEM value = " =" />
+      <ITEM value = "like" />
+    </VECTOR>
+
+  </GLOBAL_DEFINITIONS>
+
+    <SPLITPANE  divider = "225" >
+
+      <FLEXTREECOMPONENT name = "MnemonicType"
+                         init = "mnemonicTree"
+                         records = "1000"
+                         refresh = "true">
+
+          <DBCONNECT type = "global" />
+
+          <TREE name = "mnemonicTree" root = "Mnemonic Type">
+
+            <!-- optional icons for each tree level  -->
+            <TREEICON level    = "0"
+                      iconType = "standard" 
+                      icon     = "price.gif" 
+					  micon		= "price"/>
+            <TREEICON level = "1" iconType = "standard" 
+                      icon = "star.gif" 
+					  micon = "asterisk"/>
+
+            <SELECT level = "0" sql = "Select mnemonicType from MnemonicTypes "  />
+
+            <DEFAULT_TREE_MODIFIER sql = " order by mnemonicType" />
+
+            <TREE_OPTIONS_BUTTON text = "Search Options" 
+                                 foreColor = "blue" />
+
+            <TREE_MODIFIERS_DIALOG title = "Search Options"
+                                   filterBorderText = "Search Criteria"
+                                   filterBorderColor = "blue"
+                                   orderBorderColor = "blue"
+                                   editorWidth = "160"
+                                   appendAsAnd = "false" >
+
+              <DBCONNECT type = "global" />
+
+              <COUNT_SQL sql = "select count(mnemonicType)
+                                  from MnemonicTypes"/>
+
+              <!-- operators1 hash1 -->
+
+              <FILTER_OPTION label = "Type"  altValue = "mnemonicType"
+                             editorType = "text" autoQuote = "true" >
+                <OPERATORS ifdef = "operators1" />
+              </FILTER_OPTION>
+
+
+              <ORDER_OPTION  label = "order" editorType = "combo">
+                <COMBO_OPTIONS>
+                  <COMBO_OPTION value = "Type Desc" 
+                                altValue = "mnemonicType desc" />
+                  <COMBO_OPTION value = "Type Asc" 
+                                altValue =  "mnemonicType asc" />
+                </COMBO_OPTIONS>
+              </ORDER_OPTION>
+            </TREE_MODIFIERS_DIALOG>
+          </TREE>
+        </FLEXTREECOMPONENT>
+
+
+        <!-- every flex component has a name which is needed for referencing and attaching listeners-->
+            <FLEXTABLECOMPONENT name = "CodesView" greenbar = "true" 
+                                log = "true"
+                                sortable = "true">
+                                
+              <DBCONNECT type = "global" />
+
+              <!-- name of component being listened to -->
+              <TRIGGER name = "MnemonicType" />
+
+              <TABLE key = "mnemonicTree.1" >
+                <SELECT sql = "Select MnemonicTypeIdx,
+                                      MnemonicCode,
+                                      string('0x', inttohex(idx)) Hex,
+                                      Idx,
+                                      ReturnCodeMsg
+                                 from MnemonicCodesView
+                                where mnemonicType= //mnemonicTree.1
+                                order by mnemonicCodesView.idx" />
+                                
+                <UPDATE sql = "Update MnemonicCodesView set returnCodeMsg = //ReturnCodeMsg
+                                 where mnemonicTypeIdx = //MnemonicTypeIdx and idx = //Idx" />
+
+                <TABLECOLUMNS>
+                  <TABLECOLUMN name = "MnemonicTypeIdx" align = "center" />
+                  <TABLECOLUMN name = "Idx" align = "right" />
+                </TABLECOLUMNS>
+
+              </TABLE>
+          </FLEXTABLECOMPONENT>
+     </SPLITPANE>
+</FLEXSCREEN>

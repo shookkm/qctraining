@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     defaultUser.xml
+   - Description:
+   -
+   - (c) COPYRIGHT Queen City Software, Inc. 2007 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of Queen City Software, Inc.
+   -
+   - $Id: defaultUser.xml 1076 2007-11-02 20:32:04Z wlw $
+   - Notes:
+  -->
+<SecurityPass>
+
+  <User name = "" password = "" defaultPersmission = "false"
+        defaultWorkStation = "true" hideOnDisable = "false"/>
+
+  <WORKSTATIONS>
+  </WORKSTATIONS>  
+
+  <PERMISSIONS>
+  </PERMISSIONS>
+
+  <StartUp>
+  </StartUp>
+
+</SecurityPass>

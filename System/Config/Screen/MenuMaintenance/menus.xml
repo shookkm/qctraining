@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     menus.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: menus.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<menuMaintenance>
+      <menu commandId = "maintenance"
+            text = "Maintenance"
+            accelerator = "M"
+            security = "true"
+            dome = "true">
+        <menuitem commandId = "locationMaintenance"
+                  text = "Location Maintenance"
+                  handler = "defaultScreen" />
+                  
+        <menuitem commandId = "pickSlotting"
+                  text = "Forward Pick Slotting"
+                  handler = "defaultScreen" />
+                  
+        <separator />
+      <Include includeFlag = "0x200"
+               filename = "$SCREEN_CONFIG_DIR/MenuMaintenance/atopItemMenu.xml"/>
+        <separator />
+      <Include includeFlag = "0x100"
+               filename = "$SCREEN_CONFIG_DIR/MenuMaintenance/opexItemMenu.xml"/>
+      </menu>
+</menuMaintenance>

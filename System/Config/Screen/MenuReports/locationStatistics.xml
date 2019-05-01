@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+<!--
+   - Filename:     locationStatistics.xml
+   - Description:
+   -
+   - (c) COPYRIGHT QC Software, LLC 2018 All Rights Reserved
+   - No part of this copyrighted work may be reproduced, modified, or
+   - distributed in any form or by any means without the prior written
+   - permission of QC Software, LLC.
+   -
+   - $Id: locationStatistics.xml 10242 2018-06-06 19:46:47Z wlw $
+   - Notes:
+  -->
+<FLEXSCREEN
+  title="Location Statistics"
+  height="300"
+  width="800"
+  frametype="internal">
+
+  <DBCONNECT
+    type="predefined"
+    connectionId="default"
+    setglobal="true"/>
+  
+  <TABPANE
+    tabplacement="top">
+    <TAB
+      title="OPEX 1">
+      <FLEXTABLECOMPONENT
+        name="OPEX1"
+        init="OPEX1Table"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="OPEX1Table">
+          <SELECT
+            sql="&#xA;select coalesce(s.storageunittype, 'Total') Tub_Configuration
+                 &#xA;     , count(distinct s.storageId) Tubs
+                 &#xA;     , count(*) Compartments
+                 &#xA;     , sum(if(i.unit is null or i.qty = 0) then 1 else 0 endif) Compartments_Available
+                 &#xA;     , sum(if(i.unit is not null and i.qty &gt; 0) then 1 else 0 endif) Comparments_Used
+                 &#xA;     , cast(Compartments_Available * 100./Compartments as numeric(5, 2)) Percent_Available
+                 &#xA;  from Storage s
+                 &#xA;  join Inventory i
+                 &#xA; where s.storageUnitType like '_x_'
+                 &#xA; group by s.storageUnitType with rollup
+                 &#xA; order by 1"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+    <TAB
+      title="Pallet Flow">
+      <FLEXTABLECOMPONENT
+        name="PalletFlow"
+        init="PalletFlowTable"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="PalletFlowTable">
+          <SELECT
+            sql="&#xA;select coalesce(lz.description, 'Total') Zone
+                 &#xA;     , count(distinct l.locationId) Locations
+                 &#xA;     , sum(if(asu.unit is null) then 1 else 0 endif) Locations_Available
+                 &#xA;     , sum(if(asu.unit is not null) then 1 else 0 endif) Locations_Used
+                 &#xA;     , cast(Locations_Available * 100./Locations as numeric(5, 2)) Percent_Available
+                 &#xA;  from AcceptableStorageUnits asu
+                 &#xA;  join Locations l
+                 &#xA;  join LocationZones lz
+                 &#xA; where lz.description like 'Zone [16789]'
+                 &#xA; group by lz.description with rollup
+                 &#xA; order by if(Zone = 'Total') then 'ZZ' else Zone endif"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+    <TAB
+      title="Pallet Cluster">
+      <FLEXTABLECOMPONENT
+        name="PalletCluster"
+        init="PalletClusterTable"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="PalletClusterTable">
+          <SELECT
+            sql="&#xA;select coalesce(lz.description, 'Total') Zone
+                 &#xA;     , count(distinct l.locationId) Locations
+                 &#xA;     , Locations * 4 Capacity
+                 &#xA;     , Capacity - sum(if(asu.unit is not null) then 1 else 0 endif) Positions_Available
+                 &#xA;     , sum(if(asu.unit is not null) then 1 else 0 endif) Positions_Used
+                 &#xA;     , cast(Positions_Available * 100./Capacity as numeric(5, 2)) Percent_Available
+                 &#xA;  from AcceptableStorageUnits asu
+                 &#xA;  join Locations l
+                 &#xA;  join LocationZones lz
+                 &#xA; where lz.description like 'Zone [2345]'
+                 &#xA; group by lz.Description with rollup
+                 &#xA; order by if(Zone = 'Total') then 'ZZ' else Zone endif"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+    <TAB
+      title="Case Flow">
+      <FLEXTABLECOMPONENT
+        name="CaseFlow"
+        init="CaseFlowTable"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="CaseFlowTable">
+          <SELECT
+            sql="&#xA;select coalesce(lz.description, 'Total') Zone
+                 &#xA;     , count(distinct l.locationId) Locations
+                 &#xA;     , sum(if(asu.unit is null) then 1 else 0 endif) Locations_Available
+                 &#xA;     , sum(if(asu.unit is not null) then 1 else 0 endif) Locations_Used
+                 &#xA;     , cast(Locations_Available * 100./Locations as numeric(5, 2)) Percent_Available
+                 &#xA;  from AcceptableStorageUnits asu
+                 &#xA;  join Locations l
+                 &#xA;  join LocationZones lz
+                 &#xA; where lz.description like 'Zone 1_'
+                 &#xA; group by lz.Description with rollup
+                 &#xA; order by if(Zone = 'Total') then 'ZZ' else Zone endif"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+    <TAB
+      title="Forward Reserve">
+      <FLEXTABLECOMPONENT
+        name="ForwardReserve"
+        init="ForwardReserveTable"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="ForwardReserveTable">
+          <SELECT
+            sql="&#xA;with
+                 &#xA;  OccupiedLocations(locationId, occupied) as (
+                 &#xA;    select distinct l.locationId
+                 &#xA;         , if(sum(coalesce(i.qty, 0)) > 0) then 1 else 0 endif
+                 &#xA;      from MasterZonesView v
+                 &#xA;      join LocationZones lz
+                 &#xA;        on v.subZoneId = lz.zoneId
+                 &#xA;      join Locations l
+                 &#xA;      left outer join Storage s
+                 &#xA;        on l.locationId = s.locationId
+                 &#xA;      left outer join Inventory i
+                 &#xA;     where v.masterZoneId = 'ForwardReserve'
+                 &#xA;     group by l.locationId)
+                 &#xA;select coalesce(lz.description, 'Total') Zone
+                 &#xA;     , count(distinct ol.locationId) Locations
+                 &#xA;     , sum(if(ol.occupied = 0) then 1 else 0 endif) Empty_Locations
+                 &#xA;     , sum(if(ol.occupied = 1) then 1 else 0 endif) Occupied_Locations
+                 &#xA;     , cast(Empty_Locations * 100./Locations as numeric(5, 2)) Percent_Available
+                 &#xA;  from OccupiedLocations ol
+                 &#xA;  join Locations l
+                 &#xA;    on ol.locationId = l.locationId
+                 &#xA;  join LocationZones lz
+                 &#xA; group by lz.Description with rollup
+                 &#xA; order by if(Zone = 'Total') then 'ZZ' else Zone endif"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+    <TAB
+      title="Deep Reserve">
+      <FLEXTABLECOMPONENT
+        name="DeepReserve"
+        init="DeepReserveTable"
+        refresh="true"
+        refreshOnUpdate="true"
+        greenbar="true"
+        log="true" >
+
+        <DBCONNECT
+          type="global" />
+
+        <TABLE
+          key="DeepReserveTable">
+          <SELECT
+            sql="&#xA;with
+                 &#xA;  OccupiedLocations(locationId, occupied) as (
+                 &#xA;    select distinct l.locationId
+                 &#xA;         , if(sum(coalesce(i.qty, 0)) > 0) then 1 else 0 endif
+                 &#xA;      from MasterZonesView v
+                 &#xA;      join LocationZones lz
+                 &#xA;        on v.subZoneId = lz.zoneId
+                 &#xA;      join Locations l
+                 &#xA;      left outer join Storage s
+                 &#xA;        on l.locationId = s.locationId
+                 &#xA;      left outer join Inventory i
+                 &#xA;     where v.masterZoneId = 'DeepReserve'
+                 &#xA;     group by l.locationId)
+                 &#xA;select coalesce(lz.description, 'Total') Zone
+                 &#xA;     , count(distinct ol.locationId) Locations
+                 &#xA;     , sum(if(ol.occupied = 0) then 1 else 0 endif) Empty_Locations
+                 &#xA;     , sum(if(ol.occupied = 1) then 1 else 0 endif) Occupied_Locations
+                 &#xA;     , cast(Empty_Locations * 100./Locations as numeric(5, 2)) Percent_Available
+                 &#xA;  from OccupiedLocations ol
+                 &#xA;  join Locations l
+                 &#xA;    on ol.locationId = l.locationId
+                 &#xA;  join LocationZones lz
+                 &#xA; group by lz.description with rollup
+                 &#xA; order by if(Zone = 'Total') then 'ZZ' else Zone endif"/>
+        </TABLE>
+      </FLEXTABLECOMPONENT>
+    </TAB>
+  </TABPANE>
+</FLEXSCREEN>
