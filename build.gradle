@@ -31,6 +31,7 @@ plugins {
   id "org.jetbrains.kotlin.plugin.spring" version "1.3.20"
   id "com.qcsoftware.qc-toolkit-plugin" version "1.0.0"
   id "eclipse"
+  id "java"
 }
 //for temporary plugins block limitation
 apply plugin: "com.jfrog.artifactory"
