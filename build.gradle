@@ -121,7 +121,7 @@ eclipse {
       entries.each {
         source ->
           if (source.kind == 'src' && source.toString().contains('output')) {
-            source.output = '${buildDir}/build-eclipse'
+            source.output = "${buildDir}/build-eclipse"
           }
       }
     }
