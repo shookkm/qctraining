@@ -1,4 +1,4 @@
-image: firearrow/oracle-java-8-jdk-git
+image: scottyengineering/java11
 
 pipelines:
   pull-requests:
