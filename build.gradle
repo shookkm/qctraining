@@ -148,6 +148,7 @@ java {
 }
 
 task generateGitChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+  fromRepo = "${projectDir}"
   file = new File("CHANGELOG.md")
   untaggedName = project.version
   ignoreCommitsIfMessageMatches = ".*\\[skip ci\\].*"
