@@ -39,7 +39,8 @@ apply plugin: "com.jaredsburrows.license"
 apply plugin: "com.qcsoftware.qc-release-plugin"
 apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
-def javaVersion =JavaVersion.VERSION_1_8
+def javaVersion =JavaVersion.VERSION_11
+def kotlinJavaVersion = JavaVersion.VERSION_1_8
 
 project.ext.sybasejava = System.env.SQLANY17 != null ?
   "${System.env.SQLANY17}${File.separator}java" :
@@ -131,13 +132,13 @@ eclipse {
 compileKotlin {
   kotlinOptions {
     freeCompilerArgs = ["-Xjsr305=strict"]
-    jvmTarget = javaVersion
+    jvmTarget = kotlinJavaVersion
   }
 }
 compileTestKotlin {
   kotlinOptions {
     freeCompilerArgs = ["-Xjsr305=strict"]
-    jvmTarget = javaVersion
+    jvmTarget = kotlinJavaVersion
   }
 }
 
