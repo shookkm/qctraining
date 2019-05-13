@@ -14,6 +14,7 @@
     * Enable all desired checks
     * Ensure that the premium features are all enabled
 * Add default reviewers - this is usually the dev lead and senior devs
+* Enable JIRS Ticket check under Settings -> Links
 * Lock master branch
     * Only allow select people to directly change master
     * (Temporary) Ensure Phillipe Briones is one of the users that can write directly to master as the credentials for automation are under his account
