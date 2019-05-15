@@ -107,6 +107,7 @@ artifactory {
 
 dependencies {
   runtime project.ext.sqlanywhere
+  implementation 'com.qcsoftware:ojdbc10:1.0.0'
 }
 
 eclipse {
