@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The log4j configuration -->
+<!-- See http://logging.apache.org/log4j/2.x/manual/configuration.html#ConfigurationSyntax -->
+<Configuration xmlns:xi="http://www.w3.org/2001/XInclude"
+               name="application"
+               monitorInterval="30"
+               status="warn"
+               packages="com.qcsoftware.library.log4j">
+  <!-- Includes -->
+  <!-- Note: Changes to include files will not by noticed by lo4j monitor unless this file is changed  -->
+  <xi:include href="log4j2-properties.xml" />
+  <!-- Uncomment to enable line endings; also modify properties' commonPattern to include line number -->
+  <!--  <Loggers>-->
+  <!--    &lt;!&ndash; The logger level threshold for the contained appenders &ndash;&gt;-->
+  <!--    <Root level="trace" includeLocation="true">-->
+  <!--      <AppenderRef ref="Console" />-->
+  <!--      <AppenderRef ref="RollingFile" />-->
+  <!--      &lt;!&ndash;<AppenderRef ref="Email" />&ndash;&gt;-->
+  <!--    </Root>-->
+  <!--  </Loggers>-->
+  <!-- The filters for all enabled loggers -->
+  <Filters>
+    <!-- See http://logging.apache.org/log4j/2.x/manual/filters.html -->
+    <!-- Standard Legacy Log Levels -->
+    <!-- Error Logger -->
+    <LoggerNameFilter loggerName="ErrorLogger" onMatch="ACCEPT" />
+    <!-- Screen Level -->
+    <LoggerNameFilter tracerLevel="0x00000001" onMatch="ACCEPT" />
+    <!-- File Level -->
+    <LoggerNameFilter tracerLevel="0x00000002" onMatch="ACCEPT" />
+    <!-- Network Level -->
+    <LoggerNameFilter tracerLevel="0x00000004" onMatch="DENY" />
+    <!-- Tracer Dump Level -->
+    <LoggerNameFilter tracerLevel="0x00000008" onMatch="ACCEPT" />
+    <!-- General Level -->
+    <LoggerNameFilter tracerLevel="0x00000010" onMatch="ACCEPT" />
+    <!-- Configuration File Level -->
+    <LoggerNameFilter tracerLevel="0x00000020" onMatch="ACCEPT" />
+    <!-- Logger Level -->
+    <LoggerNameFilter tracerLevel="0x00000040" onMatch="ACCEPT" />
+    <!-- Security Level -->
+    <LoggerNameFilter tracerLevel="0x00000080" onMatch="DENY" />
+    <!-- Database Level -->
+    <LoggerNameFilter tracerLevel="0x00000100" onMatch="DENY" />
+    <!-- Milliseconds Level -->
+    <LoggerNameFilter tracerLevel="0x00000200" onMatch="DENY" />
+  </Filters>
+</Configuration>

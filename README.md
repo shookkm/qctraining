@@ -6,6 +6,9 @@
 * Update ./gradle.properties
     * Name to reflect project
     * Version
+* Update System/Config/Log4j contents
+    * Update projectName property in log4j2-properties.xml
+    * Create a copy of default.log4j2.xml with the appropriate name per mgr/interface that needs specific logging
 * Check if bitbucket-pipelines.yml has sufficient automations and checks
     * Only does build checks at the moment
     * Will later on include tests

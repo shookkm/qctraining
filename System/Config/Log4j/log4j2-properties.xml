@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Properties -->
+<!-- See http://logging.apache.org/log4j/2.x/manual/configuration.html#PropertySubstitution -->
+
+<!-- For properties common to all files. Can be moved inside of configuration for per-file basis -->
+<Properties>
+  <Property name="projectName">
+    Java Template
+  </Property>
+<!--  <Property name="commonPattern">-->
+<!--        [%d{YYYY-MM-dd HH:mm:ss.SSS}] [%-5level] [%5T] [%-25logger{1}]: %message%n-->
+<!--    &lt;!&ndash;   Do not use in prod. Add method name, file and line number. &ndash;&gt;-->
+<!--&lt;!&ndash;    [%d{YYYY-MM-dd HH:mm:ss.SSS}] [%-5level] [%5T] [%L] [%logger{1}.%M(%F:%L)]: %message%n&ndash;&gt;-->
+<!--  </Property>-->
+</Properties>
