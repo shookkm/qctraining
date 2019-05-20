@@ -112,7 +112,6 @@ dependencies {
 
 eclipse {
   classpath {
-    containers 'org.jetbrains.kotlin.core.KOTLIN_CONTAINER'
     defaultOutputDir = file("${buildDir}/build-eclipse")
     downloadSources = true
 
