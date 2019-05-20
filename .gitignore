@@ -9,3 +9,4 @@
 /.settings/
 /.nb-gradle/
 /Classes/
+/System/Config/Log4j/generated
