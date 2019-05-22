@@ -27,8 +27,8 @@ buildscript{
   }
 }
 plugins {
-  id 'org.jetbrains.kotlin.jvm' version '1.3.20'
-  id "org.jetbrains.kotlin.plugin.spring" version "1.3.20"
+  id 'org.jetbrains.kotlin.jvm' version '1.3.31'
+  id "org.jetbrains.kotlin.plugin.spring" version "1.3.31"
   id "com.qcsoftware.qc-toolkit-plugin" version "1.0.1"
   id "eclipse"
   id "java"
@@ -40,7 +40,7 @@ apply plugin: "com.qcsoftware.qc-release-plugin"
 apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
 def javaVersion =JavaVersion.VERSION_11
-def kotlinJavaVersion = JavaVersion.VERSION_1_8
+def kotlinJavaVersion = JavaVersion.VERSION_11
 
 project.ext.sybasejava = System.env.SQLANY17 != null ?
   "${System.env.SQLANY17}${File.separator}java" :
