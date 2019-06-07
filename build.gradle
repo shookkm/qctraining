@@ -49,7 +49,7 @@ project.ext.sybasejava = System.env.SQLANY17 != null ?
     System.env.SQLANY12 != null ?
       "${System.env.SQLANY12}${File.separator}java" :
       "${System.env.ASA}${File.separator}java"
-project.ext.sqlanywhere = files("${project.ext.sybasejava}/sajdbc4.jar", "${project.ext.sybasejava}/jodbc4.jar")
+project.ext.sqlanywhere = files("${project.ext.sybasejava}/sajdbc4.jar")
 
 repositories {
   maven { url "https://dl.bintray.com/kotlin/ktor" }
