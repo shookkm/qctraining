@@ -73,6 +73,11 @@ sourceSets {
       srcDir 'System/Config'
       exclude '**/.gitkeep'
     }
+    kotlin {
+      srcDir 'Src'
+      srcDir 'QcUpdates/Src'
+      exclude '**/.gitkeep'
+    }
   }
   test {
     java {
