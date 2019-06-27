@@ -1,16 +1,9 @@
-/******************************************************************************
- *
- * Filename:     build.gradle
- * Description:
- *
+/* *****************************************************************************
  * (c) COPYRIGHT Queen City Software, Inc. 2015 All Rights Reserved
  * No part of this copyrighted work may be reproduced, modified, or distributed
  * in any form or by any means without the prior written permission of Queen
  * City Software, Inc.
- *
- * $Id: build.gradle 789 2016-01-12 18:06:18Z btf $
- * Notes:
- *
+
  *****************************************************************************/
 //for temporary plugins block limitation
 buildscript{
@@ -22,7 +15,7 @@ buildscript{
   dependencies{
     classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.5"
     classpath "com.jaredsburrows:gradle-license-plugin:0.8.42"
-    classpath "com.qcsoftware.qc-release-plugin:com.qcsoftware.qc-release-plugin.gradle.plugin:1.1.1"
+    classpath "com.qcsoftware.qc-release-plugin:com.qcsoftware.qc-release-plugin.gradle.plugin:1.1.2"
     classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.60"
   }
 }
