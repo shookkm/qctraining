@@ -12,9 +12,3 @@ pluginManagement{
     gradlePluginPortal()
   }
 }
-
-// add products based on gradle.properties
-if(properties['qcToolkit.isAgainstLocal'].toBoolean()){
-  include properties['qcToolkit.localName']
-  project(properties['qcToolkit.localName']).projectDir = new File(products_dir)
-}

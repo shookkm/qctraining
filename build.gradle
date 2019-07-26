@@ -3,46 +3,26 @@
  * No part of this copyrighted work may be reproduced, modified, or distributed
  * in any form or by any means without the prior written permission of Queen
  * City Software, Inc.
-
  *****************************************************************************/
-//for temporary plugins block limitation
-buildscript{
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies{
-    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4.9.5"
-    classpath "com.jaredsburrows:gradle-license-plugin:0.8.42"
-    classpath "com.qcsoftware.qc-release-plugin:com.qcsoftware.qc-release-plugin.gradle.plugin:1.1.3"
-    classpath "gradle.plugin.se.bjurr.gitchangelog:git-changelog-gradle-plugin:1.60"
-  }
-}
+
 plugins {
-  id 'org.jetbrains.kotlin.jvm' version '1.3.31'
-  id "org.jetbrains.kotlin.plugin.spring" version "1.3.31"
-  id "com.qcsoftware.qc-toolkit-plugin" version "1.0.1"
+  id "com.jfrog.artifactory" version "4.9.8"
+  id 'org.jetbrains.kotlin.jvm' version '1.3.41'
+  id "org.jetbrains.kotlin.plugin.spring" version "1.3.41"
+  id "com.jaredsburrows.license" version "0.8.42"
+  id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "1.63"
+  id "com.qcsoftware.qc-release-plugin" version "1.1.3"
   id "eclipse"
   id "java"
 }
-//for temporary plugins block limitation
-apply plugin: "com.jfrog.artifactory"
-apply plugin: "com.jaredsburrows.license"
-apply plugin: "com.qcsoftware.qc-release-plugin"
-apply plugin: "se.bjurr.gitchangelog.git-changelog-gradle-plugin"
 
-def javaVersion =JavaVersion.VERSION_11
+def javaVersion = JavaVersion.VERSION_11
 def kotlinJavaVersion = JavaVersion.VERSION_11
 
-project.ext.sybasejava = System.env.SQLANY17 != null ?
-  "${System.env.SQLANY17}${File.separator}java" :
-  System.env.SQLANY16 != null ?
-    "${System.env.SQLANY16}${File.separator}java" :
-    System.env.SQLANY12 != null ?
-      "${System.env.SQLANY12}${File.separator}java" :
-      "${System.env.ASA}${File.separator}java"
-project.ext.sqlanywhere = files("${project.ext.sybasejava}/sajdbc4.jar")
+dependencies {
+  runtime files("${System.getenv("SQLANY17") ?: System.getenv("SQLANY16")}/java/sajdbc4.jar")
+  implementation 'com.qcsoftware:qc-toolkit:14.14.0'
+}
 
 repositories {
   maven { url "https://dl.bintray.com/kotlin/ktor" }
@@ -55,7 +35,6 @@ repositories {
       username "$artifactory_user"
       password "$artifactory_password"
     }
-
   }
 }
 
@@ -71,10 +50,20 @@ sourceSets {
       srcDir 'QcUpdates/Src'
       exclude '**/.gitkeep'
     }
+    java {
+      srcDir 'Src'
+      srcDir 'QcUpdates/Src'
+      exclude '**/.gitkeep'
+    }
   }
   test {
     java {
       srcDir 'Test/Src'
+      exclude '**/.gitkeep'
+    }
+    kotlin {
+      srcDir 'Test/Src'
+      exclude '**/.gitkeep'
     }
     resources {
       srcDir 'Test/Resources'
@@ -103,18 +92,10 @@ artifactory {
   }
 }
 
-dependencies {
-  runtime project.ext.sqlanywhere
-}
-
 eclipse {
   classpath {
     defaultOutputDir = file("${buildDir}/build-eclipse")
     downloadSources = true
-
-    /*
-     * needed with newer gradle
-     */
     file.whenMerged {
       entries.each {
         source ->

@@ -1,48 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- The log4j configuration -->
-<!-- See http://logging.apache.org/log4j/2.x/manual/configuration.html#ConfigurationSyntax -->
-<Configuration xmlns:xi="http://www.w3.org/2001/XInclude"
-               name="application"
-               monitorInterval="30"
-               status="warn"
-               packages="com.qcsoftware.library.log4j">
-  <!-- Includes -->
+<Configuration xmlns:xi="http://www.w3.org/2001/XInclude" monitorInterval="30" name="application" packages="com.qcsoftware.library.log4j" status="warn">
+  <!-- See http://logging.apache.org/log4j/2.x/manual/configuration.html#ConfigurationSyntax -->
   <!-- Note: Changes to include files will not by noticed by lo4j monitor unless this file is changed  -->
-  <xi:include href="log4j2-properties.xml" />
-  <!-- Uncomment to enable line endings; also modify properties' commonPattern to include line number -->
-  <!--  <Loggers>-->
-  <!--    &lt;!&ndash; The logger level threshold for the contained appenders &ndash;&gt;-->
-  <!--    <Root level="trace" includeLocation="true">-->
-  <!--      <AppenderRef ref="Console" />-->
-  <!--      <AppenderRef ref="RollingFile" />-->
-  <!--      &lt;!&ndash;<AppenderRef ref="Email" />&ndash;&gt;-->
-  <!--    </Root>-->
-  <!--  </Loggers>-->
-  <!-- The filters for all enabled loggers -->
+  <xi:include href="log4j2-properties.xml"/>
+  <Loggers>
+    <!-- The logger level threshold for the contained appenders -->
+    <Root level="ALL">
+      <AppenderRef level="INFO" ref="Console"/>
+      <AppenderRef ref="RollingFile"/>
+      <!--<AppenderRef ref="Email" />-->
+    </Root>
+    <!-- http://logging.apache.org/log4j/2.x/manual/configuration.html#Additivity -->
+  </Loggers>
   <Filters>
     <!-- See http://logging.apache.org/log4j/2.x/manual/filters.html -->
-    <!-- Standard Legacy Log Levels -->
     <!-- Error Logger -->
-    <LoggerNameFilter loggerName="ErrorLogger" onMatch="ACCEPT" />
+    <LoggerNameFilter loggerName="ErrorLogger" onMatch="ACCEPT"/>
     <!-- Screen Level -->
-    <LoggerNameFilter tracerLevel="0x00000001" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000001"/>
     <!-- File Level -->
-    <LoggerNameFilter tracerLevel="0x00000002" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000002"/>
     <!-- Network Level -->
-    <LoggerNameFilter tracerLevel="0x00000004" onMatch="DENY" />
+    <LoggerNameFilter onMatch="DENY" tracerLevel="0x00000004"/>
     <!-- Tracer Dump Level -->
-    <LoggerNameFilter tracerLevel="0x00000008" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000008"/>
     <!-- General Level -->
-    <LoggerNameFilter tracerLevel="0x00000010" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000010"/>
     <!-- Configuration File Level -->
-    <LoggerNameFilter tracerLevel="0x00000020" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000020"/>
     <!-- Logger Level -->
-    <LoggerNameFilter tracerLevel="0x00000040" onMatch="ACCEPT" />
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000040"/>
     <!-- Security Level -->
-    <LoggerNameFilter tracerLevel="0x00000080" onMatch="DENY" />
+    <LoggerNameFilter onMatch="DENY" tracerLevel="0x00000080"/>
     <!-- Database Level -->
-    <LoggerNameFilter tracerLevel="0x00000100" onMatch="DENY" />
+    <LoggerNameFilter onMatch="DENY" tracerLevel="0x00000100"/>
     <!-- Milliseconds Level -->
-    <LoggerNameFilter tracerLevel="0x00000200" onMatch="DENY" />
+    <LoggerNameFilter onMatch="DENY" tracerLevel="0x00000200"/>
+    <!-- Spring Logs -->
+    <LoggerNameFilter isRegex="true" loggerName="org.springframework.*" onMatch="ACCEPT"/>
+    <!--Tracer Autolog-->
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000400"/>
+    <!--Tracer Task Thread-->
+    <LoggerNameFilter onMatch="ACCEPT" tracerLevel="0x00000800"/>
   </Filters>
 </Configuration>
