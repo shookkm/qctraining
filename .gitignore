@@ -1,6 +1,8 @@
 
 /.gradle/
-/.idea/
+!/.idea/
+/.idea/*
+!/.idea/runConfigurations/
 /build/
 /qc-releases/
 /out/
@@ -10,3 +12,4 @@
 /.nb-gradle/
 /Classes/
 /System/Config/Log4j/generated
+/System/Log/Tmp
