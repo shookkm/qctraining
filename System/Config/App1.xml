@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Filename: App1.xml
+  - Description:
+  -
+  - (c) COPYRIGHT Queen City Software, Inc. 2018 All Rights Reserved
+  - No part of this copyrighted work may be reproduced, modified, or
+  - distributed in any form or by any means without the prior written
+  - permission of Queen City Software, Inc.
+  -
+  - $Id$
+  - Notes:
+-->
+<beans
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:qc="http://www.qcsoftware.com/schema/products/springapp"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:c="http://www.springframework.org/schema/c"
+  xsi:schemaLocation="
+    http://www.springframework.org/schema/beans 
+    http://www.springframework.org/schema/beans/spring-beans.xsd
+    
+    http://www.qcsoftware.com/schema/products/springapp 
+    http://www.qcsoftware.com/schema/products/springapp/qcapp.xsd
+    
+    http://www.springframework.org/schema/context
+    http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <context:property-placeholder/>
+
+  <qc:QcApp >
+    <DbConnect
+      id="wcs"
+      machine="$DATABASE_MACHINE"
+      database="$DATABASE_NAME"
+      user="qc"
+      password="qc"
+      port="$DATABASE_PORT"
+      adapter="Library.Database.IAnywhereDatabaseAdapter"
+      trackStatements="true">
+      <Property name="enableDatabaseMessage" value="true"/>
+    </DbConnect>
+
+    <DbPool
+      dbId="wcs"
+      minSize="5"/>
+
+  </qc:QcApp>
+</beans>

@@ -1,0 +1,23 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="App1_template" type="Application" factoryName="Application">
+    <envs>
+      <env name="DATABASE_MACHINE" value="argus" />
+      <env name="DATABASE_NAME" value="qcdev" />
+      <env name="DATABASE_PORT" value="53000" />
+      <env name="TCPIP_PORT_CTRL_NODE" value="qcslab1512" />
+      <env name="TCPIP_PORT_CTRL_PORT" value="18800" />
+      <env name="CONFIG_DIR" value="$PROJECT_DIR$/System/Config" />
+      <env name="TMP_DIR" value="$PROJECT_DIR$/System/Tmp" />
+      <env name="TCPIP_IDLE_TIMEOUT" value="0" />
+      <env name="TMPLOG_DIR" value="$PROJECT_DIR$/System/Log/Tmp" />
+      <env name="TRACER_DIR" value="$PROJECT_DIR$/System/Log/Tmp" />
+    </envs>
+    <option name="MAIN_CLASS_NAME" value="com.qcsoftware.products.springapp.SpringApp" />
+    <module name="qctraining.main" />
+    <option name="PROGRAM_PARAMETERS" value="-r -L app1 -c app1 -n app1_${USERNAME}" />
+    <shortenClasspath name="MANIFEST" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
