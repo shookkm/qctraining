@@ -5,7 +5,7 @@
 <!-- For properties common to all files. Can be moved inside of configuration for per-file basis -->
 <Properties>
   <Property name="projectName">
-    Java Template
+    QC Training
   </Property>
 <!--  <Property name="commonPattern">-->
 <!--        [%d{YYYY-MM-dd HH:mm:ss.SSS}] [%-5level] [%5T] [%-25logger{1}]: %message%n-->
