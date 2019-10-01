@@ -1,5 +1,14 @@
 # QC Training
 
+  ## 0.0.2
+      ### No issue
+
+      **add app1 template and run config, update build.gradle to use newer version of qc-lib**
+
+
+      [936d3d6b57bc79f](https://bitbucket.org/qcteam1/qctraining/commits/936d3d6b57bc79f) Dom DeBellis *2019-10-01 18:43:40*
+
+
   ## 0.0.1
         ### Jira KSPAR-6 
 
@@ -274,10 +283,5 @@
 
 
       [4fd9feb54e248cf](https://bitbucket.org/qcteam1/qctraining/commits/4fd9feb54e248cf) pmb *2019-04-26 16:01:03*
-
-      **add changelog**
-
-
-      [be0deed8d2f3477](https://bitbucket.org/qcteam1/qctraining/commits/be0deed8d2f3477) pmb *2019-04-26 15:52:23*
 
 
