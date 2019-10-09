@@ -1,5 +1,15 @@
 # QC Training
 
+  ## 0.0.3
+        ### Jira QCTRAIN-4 
+
+      **QCTRAIN-4**
+
+        * Add make template and app4 empty template
+
+      [20287ba404421ac](https://bitbucket.org/qcteam1/qctraining/commits/20287ba404421ac) Dom DeBellis *2019-10-09 13:46:32*
+
+
   ## 0.0.2
       ### No issue
 
@@ -273,15 +283,5 @@
 
 
       [a421b384143de5f](https://bitbucket.org/qcteam1/qctraining/commits/a421b384143de5f) pmb *2019-04-26 16:04:24*
-
-      **update readme**
-
-
-      [ba3cf08bcbc95fb](https://bitbucket.org/qcteam1/qctraining/commits/ba3cf08bcbc95fb) pmb *2019-04-26 16:02:19*
-
-      **update readme**
-
-
-      [4fd9feb54e248cf](https://bitbucket.org/qcteam1/qctraining/commits/4fd9feb54e248cf) pmb *2019-04-26 16:01:03*
 
 
