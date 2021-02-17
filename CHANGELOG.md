@@ -1,5 +1,14 @@
 # QC Training
 
+  ## 0.0.4
+      ### No issue
+
+      **build.gradle edited online with Bitbucket**
+
+
+      [b4a202dc62a1f50](https://bitbucket.org/qcteam1/qctraining/commits/b4a202dc62a1f50) Bill Williams *2021-02-17 13:13:23*
+
+
   ## 0.0.3
         ### Jira QCTRAIN-4 
 
@@ -272,16 +281,5 @@
         * fix automation script to match gradle properties pattern
 
       [3ad48b0ddb53c9d](https://bitbucket.org/qcteam1/qctraining/commits/3ad48b0ddb53c9d) Phillipe Briones *2019-04-30 16:19:49*
-
-      **Merged in update-release-plugin (pull request #1)**
-
-        * update qc-release version
-
-      [eb05d6d2e06a062](https://bitbucket.org/qcteam1/qctraining/commits/eb05d6d2e06a062) Phillipe Briones *2019-04-26 16:39:03*
-
-      **update readme**
-
-
-      [a421b384143de5f](https://bitbucket.org/qcteam1/qctraining/commits/a421b384143de5f) pmb *2019-04-26 16:04:24*
 
 
