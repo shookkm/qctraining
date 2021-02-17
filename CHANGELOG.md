@@ -1,5 +1,14 @@
 # QC Training
 
+  ## 0.0.5
+      ### No issue
+
+      **build.gradle edited online with Bitbucket**
+
+
+      [ff9f139d2ab6d26](https://bitbucket.org/qcteam1/qctraining/commits/ff9f139d2ab6d26) Dominic DeBellis *2021-02-17 19:04:27*
+
+
   ## 0.0.4
       ### No issue
 
@@ -264,22 +273,5 @@
         * ignore eclipse generated files
 
       [0db5b51115c343c](https://bitbucket.org/qcteam1/qctraining/commits/0db5b51115c343c) Phillipe Briones *2019-04-30 17:29:13*
-
-      **Merged in update-eclipse-build (pull request #3)**
-
-        * Update eclipse build
-        * update qc-release version
-        * fix automation script to match gradle properties pattern
-        * fix eclipse build
-
-      [c553f4746c17395](https://bitbucket.org/qcteam1/qctraining/commits/c553f4746c17395) Phillipe Briones *2019-04-30 16:35:18*
-
-      **Merged in update-build-script (pull request #2)**
-
-        * Update build script
-        * update qc-release version
-        * fix automation script to match gradle properties pattern
-
-      [3ad48b0ddb53c9d](https://bitbucket.org/qcteam1/qctraining/commits/3ad48b0ddb53c9d) Phillipe Briones *2019-04-30 16:19:49*
 
 
