@@ -21,7 +21,7 @@ def kotlinJavaVersion = JavaVersion.VERSION_11
 
 dependencies {
   runtime files("${System.getenv("SQLANY17") ?: System.getenv("SQLANY16")}/java/sajdbc4.jar")
-  implementation 'com.qcsoftware:qc-toolkit:14.21.1'
+  implementation 'com.qcsoftware:qc-toolkit:16+'
 }
 
 repositories {
