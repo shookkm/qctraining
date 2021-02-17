@@ -1,5 +1,14 @@
 # QC Training
 
+  ## 0.0.6
+      ### No issue
+
+      **fix old run config**
+
+
+      [21e5c97f6accd59](https://bitbucket.org/qcteam1/qctraining/commits/21e5c97f6accd59) Dominic DeBellis *2021-02-17 19:13:24*
+
+
   ## 0.0.5
       ### No issue
 
@@ -257,21 +266,5 @@
 
 
       [2f8e61ab4c6ab16](https://bitbucket.org/qcteam1/qctraining/commits/2f8e61ab4c6ab16) Phillipe Briones *2019-04-30 19:31:41*
-
-      **Merged in remove-trailing-returns (pull request #5)**
-
-        * remove trailing returns
-
-      [34c355334b52f10](https://bitbucket.org/qcteam1/qctraining/commits/34c355334b52f10) Phillipe Briones *2019-04-30 18:04:46*
-
-      **Merged in ignore-eclipse (pull request #4)**
-
-        * Ignore eclipse
-        * update qc-release version
-        * fix automation script to match gradle properties pattern
-        * fix eclipse build
-        * ignore eclipse generated files
-
-      [0db5b51115c343c](https://bitbucket.org/qcteam1/qctraining/commits/0db5b51115c343c) Phillipe Briones *2019-04-30 17:29:13*
 
 
