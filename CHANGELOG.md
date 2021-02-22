@@ -1,5 +1,22 @@
 # QC Training
 
+  ## 0.0.7
+        ### Jira QCTRAIN-4 
+
+      **Merged in QCTRAIN-4-qctrain-setup (pull request #2)**
+
+        * QCTRAIN-4
+        * Approved-by: Bryant Frey
+
+      [10b9dec2e9a71b1](https://bitbucket.org/qcteam1/qctraining/commits/10b9dec2e9a71b1) Dominic DeBellis *2021-02-22 15:31:59*
+
+      **QCTRAIN-4**
+
+        * - encrypt db password, provide a make file
+
+      [2ad0065ff898997](https://bitbucket.org/qcteam1/qctraining/commits/2ad0065ff898997) Dom DeBellis *2021-02-22 15:28:54*
+
+
   ## 0.0.6
       ### No issue
 
@@ -261,10 +278,5 @@
         * #&#9;.gitignore
 
       [6269600f6c72334](https://bitbucket.org/qcteam1/qctraining/commits/6269600f6c72334) pmb *2019-05-01 15:59:36*
-
-      **ignore .settings folder**
-
-
-      [2f8e61ab4c6ab16](https://bitbucket.org/qcteam1/qctraining/commits/2f8e61ab4c6ab16) Phillipe Briones *2019-04-30 19:31:41*
 
 
