@@ -12,7 +12,7 @@
 PROJDIR = $(PROJECTS)/QcTraining
 JDEBUG = -g
 #JOPTS +=
-PACKAGE = com.qcsoftware.qctraining.%%INITIALS%%.projecttwo
+PACKAGE = com.qcsoftware.qcdev.%%INITIALS%%.projecttwo
 
 include $(DEVDEFAULTS)/makefile
 
