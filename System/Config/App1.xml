@@ -36,7 +36,7 @@
       machine="$DATABASE_MACHINE"
       database="$DATABASE_NAME"
       user="qc"
-      password="qc"
+      password="6hHI7QYROEcWJ0mU5Tu5Fw=="
       port="$DATABASE_PORT"
       adapter="Library.Database.IAnywhereDatabaseAdapter"
       trackStatements="true">
