@@ -1,5 +1,15 @@
 # QC Training
 
+  ## 0.0.8
+        ### Jira QCTRAIN-4 
+
+      **QCTRAIN-4**
+
+        * add new template that points to KSPAR msg hub for now
+
+      [42b46acacccdecc](https://bitbucket.org/qcteam1/qctraining/commits/42b46acacccdecc) Dom DeBellis *2021-03-09 12:55:02*
+
+
   ## 0.0.7
         ### Jira QCTRAIN-4 
 
@@ -64,17 +74,6 @@
 
 
   ## 0.0.1
-        ### Jira KSPAR-6 
-
-      **Revert "Merged in qcteam1/keurig-spartanburg/feature/KSPAR-6-flexscreen-setup-for-runscreens (pull request #6)"**
-
-        * This reverts commit 055465d34d325b493936a8c82a450c8576fcb220.
-        * # Conflicts:
-        * #&#9;.gitignore
-
-      [d8573ac90bee925](https://bitbucket.org/qcteam1/qctraining/commits/d8573ac90bee925) pmb *2019-05-01 16:02:59*
-
-
         ### Jira PRODUCT-319 
 
       **Merged in PRODUCT-319-remove-qctoolkitplugin-from- (pull request #12)**
@@ -270,13 +269,5 @@
 
 
       [94df23f9031ba4f](https://bitbucket.org/qcteam1/qctraining/commits/94df23f9031ba4f) Phillipe Briones *2019-05-01 16:03:52*
-
-      **Revert "ignore .settings folder"**
-
-        * This reverts commit 2f8e61ab4c6ab1662e599708b09e74420a04453f.
-        * # Conflicts:
-        * #&#9;.gitignore
-
-      [6269600f6c72334](https://bitbucket.org/qcteam1/qctraining/commits/6269600f6c72334) pmb *2019-05-01 15:59:36*
 
 
